@@ -2,7 +2,9 @@
 
 module Model_snow
 
-  use Parametrisation
+  use Parametrisation, only : Latent_heat, rho_water, rho_snow_freeze, gravity
+
+  Implicit none
 
   contains
 

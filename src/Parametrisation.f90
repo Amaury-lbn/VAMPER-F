@@ -16,7 +16,7 @@ module Parametrisation
 
   real,parameter :: Depth = 1000              !profondeur de la modélisation
   real,parameter :: T_init = 0                !température initiale a la surface
-  real,parameter :: T_freeze = -1             !température où l'eau est considérée comme gelée
+  real,parameter :: T_freeze = 0             !température où l'eau est considérée comme gelée
   real,parameter :: freezing_range = 1        
   real,parameter :: Gfx = 65                  ! flux géothermique de la terre (a modifier peut être)
   real,parameter :: Porosity_soil = 0.5       ! porosité du sol
@@ -40,7 +40,6 @@ module Parametrisation
   real,parameter :: C_organic = 1920        ! Capacité thermique massique de la matière organique
   real,parameter :: C_dry_soil = 850        ! Capacité thermique massique du sol
 
-  real,parameter :: Latent_heat = 333700    ! en J/kg
 
   !      Conductivité thermique (en W/(m*K))          !
 
@@ -53,7 +52,9 @@ module Parametrisation
   real, parameter :: q_quartz=0.5            ! pourcentage de quartz dans le sol
 
   real, parameter :: gravity = 9.81          ! accéleration gravitationnelle 
+  real, parameter :: Latent_heat = 333700    ! en J/kg
 
+  integer, parameter :: s_l = 1      ! nombre de couche de neige (marche que avec 1)
   
 end module Parametrisation
 

@@ -2,7 +2,10 @@
 
 module Fonction_temp
 
-  use Parametrisation
+  use Parametrisation, only : C_ice,C_dry_soil,C_organic,C_water,freezing_range,Latent_Heat,rho_ice
+  use Parametrisation, only :rho_organic,rho_soil,rho_water,K_other_minerals,K_organic,K_quartz,q_quartz
+
+  Implicit none
 
   contains
 
@@ -12,7 +15,7 @@ module Fonction_temp
     implicit none
     integer, intent(in) :: z_num, org_ind
     real, intent(in) :: Tf
-    real, dimension(:), allocatable, intent(in) :: T,n
+    real, dimension(:), intent(in) :: T,n
     real, dimension(:), allocatable, intent(out) :: Cp, porf, pori
     integer :: kk
     real :: dTheta, theta, a, Csoil

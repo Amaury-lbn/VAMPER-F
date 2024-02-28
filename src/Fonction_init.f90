@@ -2,8 +2,7 @@
 
 module Fonction_init
 
-
-  use Parametrisation
+  use Parametrisation, only : n_organic, Porosity_soil
   use Para_fonctions
 
   Implicit none
@@ -61,7 +60,7 @@ module Fonction_init
     
     
 
-    if (PorosityType == 1) then
+    if (Porosity_Type == 1) then
        
        
        pente = (Porosity_soil -0.15)/(Depth_layer(organic_ind) - Depth_layer(z_num))

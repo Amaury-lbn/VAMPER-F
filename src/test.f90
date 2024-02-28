@@ -6,6 +6,8 @@ program test_fonctions
   use Fonction_init
   use Para_fonctions
   use Fonction_temp
+  use Model_snow
+  use Fonction_implicit
 
   implicit none
   integer spy

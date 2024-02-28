@@ -1,9 +1,10 @@
 module Para_fonctions
 
+Implicit none
 
 contains
 
- ! Use Parametrisation
+
 
 
   !sous routine trouvant les parametre permettant la discrétisation en temps!   ! a changer plus tard !
