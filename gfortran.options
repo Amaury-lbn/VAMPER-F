@@ -75,7 +75,7 @@ INCVAMPER     = -I${inc_vamper_path}
 LIBLAPACK     = -Wl,-rpath=${lib_lapack_path} -L${lib_lapack_path} -llapack
 INCLAPACK     = -I${inc_lapack_path} 
 
-LIBREFBLAS    = -Wl,-rpath=${lib_blas_path} -L${lib_blas_path} -lblas
+LIBREFBLAS    = -Wl,-rpath=${lib_blas_path} -L${lib_blas_path} -lrefblas
 INCREFBLAS    = -I${inc_blas_path} 
 
 INC_F_DIR     = -I${objdir}

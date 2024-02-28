@@ -7,10 +7,10 @@
 #~ ---
 
 # specifics ... will be replaced automatically machine dependent!
-lib_lapack_path  = /home/users/alambin/lapack-3.12.0/build/lib
-inc_lapack_path  = /home/users/alambin/lapack-3.12.0/build/include
-lib_blas_path    = /home/users/alambin/lapack-3.12.0/build/lib
-inc_blas_path    = /home/users/alambin/lapack-3.12.0/build/include
+lib_lapack_path  = /home/users/alambin/lapack-3.12.0/
+inc_lapack_path  = /home/users/alambin/lapack-3.12.0/SRC
+lib_blas_path    = /home/users/alambin/lapack-3.12.0/
+inc_blas_path    = /home/users/alambin/lapack-3.12.0/SRC
 
 objdir           = .obj
 fc_compiler_path = /usr/bin/gfortran
