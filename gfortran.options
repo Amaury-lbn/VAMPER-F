@@ -72,6 +72,12 @@ INCCARAIB     = -I${inc_caraib_path} -I${com_caraib_path}
 LIBVAMPER     = -Wl,-rpath=${lib_vamper_path} -L${lib_vamper_path} -llibvamper
 INCVAMPER     = -I${inc_vamper_path} 
 
+LIBLAPACK     = -Wl,-rpath=${lib_lapack_path} -L${lib_lapack_path} -llapack
+INCLAPACK     = -I${inc_lapack_path} 
+
+LIBREFBLAS    = -Wl,-rpath=${lib_blas_path} -L${lib_blas_path} -lblas
+INCREFBLAS    = -I${inc_blas_path} 
+
 INC_F_DIR     = -I${objdir}
 MOD_F_DIR     = -J${objdir}
 

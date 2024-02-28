@@ -24,9 +24,12 @@ module Fonction_implicit
       real, dimension(:), allocatable :: Cp_temp, porf_temp, pori_temp
       real, dimension(5,z_num+s_l) :: T_iter
       real, dimension(z_num+s_l,z_num+s_l) :: MM
-      real, dimension(1,z_num+s_l) :: Solution
+      real, dimension(z_num+s_l) :: Solution
       real :: m_Gfx, A, B, C, Z1
       integer :: kk, ll, z_s
+
+      integer, dimension(z_num+s_l) :: IPIV
+      integer :: info_dgesv
 
       allocate(Timp(1:z_num))
       allocate(Cp(1:z_num))
@@ -76,7 +79,7 @@ module Fonction_implicit
 
          Kp_s(1:z_s-1) = (K_s(1:z_s-1)+K_s(2:z_s))/2.0
 
-         Solution(1,1) = Tu
+         Solution(1) = Tu
          
          do ll=2,z_s-1
             
@@ -89,7 +92,7 @@ module Fonction_implicit
             MM(ll,ll-1) = -A
             MM(ll,ll) = C
             MM(ll,ll+1) = -B
-            Solution(1,ll) = Z1
+            Solution(ll) = Z1
 
          end do
            
@@ -98,7 +101,9 @@ module Fonction_implicit
          MM(z_s,z_s-1)=-A
          MM(z_s,z_s)=C
 
-         Solution(1,z_s) = T_last(z_s) + ((dt/Cp_temp(z_num))*m_Gfx/dz_s(z_num))
+         Solution(z_s) = T_last(z_s) + ((dt/Cp_temp(z_num))*m_Gfx/dz_s(z_num))
+
+         call dgesv(z_s,1,MM,z_s,IPIV,Solution,z_s,info_dgesv)
          
       end do
 

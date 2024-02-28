@@ -7,14 +7,10 @@
 #~ ---
 
 # specifics ... will be replaced automatically machine dependent!
-lib_netcdff_path = 
-inc_netcdff_path = 
-lib_netcdf_path  = 
-inc_netcdf_path  = 
-lib_ncio_path    = 
-inc_ncio_path    = 
-lib_vamper_path  = 
-inc_vamper_path  = 
+lib_lapack_path  = /home/users/alambin/lapack-3.12.0/build/lib
+inc_lapack_path  = /home/users/alambin/lapack-3.12.0/build/include
+lib_blas_path    = /home/users/alambin/lapack-3.12.0/build/lib
+inc_blas_path    = /home/users/alambin/lapack-3.12.0/build/include
 
 objdir           = .obj
 fc_compiler_path = /usr/bin/gfortran
@@ -31,8 +27,8 @@ FMAKEDEPEND         = ${fc_fmakedep_path}
 
 FFLAGS              = $(F_OPTIM_HIGH)
 
-INCLUDES            = 
-LIBS                =
+INCLUDES            = $(INCLAPACK) $(INCREFBLAS)
+LIBS                = $(LIBLAPACK) $(LIBREFBLAS)
 
 #~
 #~ BOUNDARY FOR INSERTION OF EXTRA COMPONENTS -- DO NOT DELETE THIS LINE
