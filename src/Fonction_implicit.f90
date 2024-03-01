@@ -21,7 +21,7 @@ module Fonction_implicit
 
       real, dimension(z_num+s_l) ::  Kp_s, T_last, n_s, dz_s, K_s
       real, dimension(:), allocatable :: Cp_s, porf, pori
-      real, dimension(:), allocatable :: Cp_temp, porf_temp, pori_temp
+      real, dimension(z_num) ::Cp_temp, porf_temp, pori_temp, T_new
       real, dimension(5,z_num+s_l) :: T_iter
       real, dimension(z_num+s_l,z_num+s_l) :: MM
       real, dimension(z_num+s_l) :: Solution
@@ -37,13 +37,15 @@ module Fonction_implicit
       allocate(porf(1:z_num+s_l))
       allocate(pori(1:z_num+s_l))
       allocate(Cp_s(1:z_num+s_l))
-      allocate(Cp_temp(1:z_num))
-      allocate(porf_temp(1:z_num))
-      allocate(pori_temp(1:z_num))
+      !allocate(Cp_temp(1:z_num))
+      !allocate(porf_temp(1:z_num))
+      !allocate(pori_temp(1:z_num))
 
-      MM=0
+      
       z_s = z_num+s_l
       m_Gfx = Gfx/1000.0
+
+      
 
       T_last(s_l+1:z_s) = T_old(1:z_num)
       dz_s(1:s_l) = snw_dp
@@ -59,21 +61,30 @@ module Fonction_implicit
       
       do kk=1,5 
          
+         MM(1:z_s,1:z_s)=0
+         
          if (kk==1) then
             
             T_iter(1, 1:z_s) = T_last(1:z_s)
+
+            T_new(1:z_num) = T_last(1+s_l:z_s)
             
          else
 
             T_iter(1,1:z_s)=0.5*(T_iter(1,1:z_s)+T_last(1:z_s))
+
+            T_new(1:z_num) = 0.5*(T_last(1+s_l:z_s)+Solution(1+s_l:z_s))
+
+            !write(*,*) "coucou",T_new
+
          end if
 
 
-         call AppHeatCapacity(z_num,T_iter(1,s_l+1:z_s),T_freeze,n_s(s_l+1:z_s),org_ind+s_l,Cp_temp,pori_temp,porf_temp)
+         call AppHeatCapacity(z_num,T_new,T_freeze,n_s(s_l+1:z_s),org_ind+s_l,Cp_temp,pori_temp,porf_temp)
 
          do ll=s_l+1,z_s
             
-            call ThermalConductivity(ll,n_s(ll),pori_temp(ll-1),porf_temp(ll-1),org_ind+s_l,T_iter(1,ll),K_s(ll))
+            call ThermalConductivity(ll,n_s(ll),pori_temp(ll-1),porf_temp(ll-1),org_ind+s_l,T_new(ll),K_s(ll))
             
          end do
 
@@ -100,12 +111,26 @@ module Fonction_implicit
          C=1+A
          MM(z_s,z_s-1)=-A
          MM(z_s,z_s)=C
+         MM(1,1) = 1
 
-         Solution(z_s) = T_last(z_s) + ((dt/Cp_temp(z_num))*m_Gfx/dz_s(z_num))
+         Solution(z_s) = T_new(z_num) + ((dt/Cp_temp(z_num))*m_Gfx/dz_s(z_num))
+         
+         
 
-         call dgesv(z_s,1,MM,z_s,IPIV,Solution,z_s,info_dgesv)
+         call sgesv(z_s,1,MM,z_s,IPIV,Solution,z_s,info_dgesv)
+         
+         
          
       end do
+
+
+      Timp(1:z_num) = Solution(s_l+1:z_s)
+      
+      !write(*,*) "coucou", Solution
+
+      Cp(1:z_num) = Cp_temp(1:z_num)
+      Kp(1:z_num) = K_s(s_l+1:z_s)
+      Tsnw = Solution(1)
 
     end subroutine Implicit_snow
 
@@ -115,69 +140,91 @@ module Fonction_implicit
       integer, intent(in) :: org_ind
       real, intent(in) :: dt,Tu,Tb
       real, dimension(:), intent(in) :: T_old, n, dz
-      real, dimension(:), allocatable, intent(out) :: Timp, Cp, Kp
+      real, dimension(:), allocatable, intent(out) :: Timp, Kp
+      real, dimension(z_num), intent(out) :: Cp
       
-      real, dimension(:),allocatable :: pori, porf
+      real, dimension(z_num) :: pori, porf, Cp_temp
       real, dimension(z_num,z_num) :: MM
-      real, dimension(1,z_num) :: Solution
+      real, dimension(z_num,1) :: Solution
       real :: m_Gfx, A, B, C, Z1
       integer :: kk, ll
-      real, dimension(z_num) :: T_last
+      real, dimension(z_num) :: T_last, T_new
       real, dimension(5,z_num) :: T_iter
+
+      integer, dimension(z_num) :: IPIV
+      integer :: info_dgesv
       
       m_Gfx = gfx/1000.0
 
       allocate(Timp(1:z_num))
-      allocate(Cp(1:z_num))
+      !allocate(Cp(1:z_num))
       allocate(Kp(1:z_num))
-      allocate(pori(1:z_num))
-      allocate(porf(1:z_num))
-
+      !allocate(pori(1:z_num))
+      !allocate(porf(1:z_num))
+      !write(*,*) "coucou"
       T_last = T_old
-
+ 
       do kk=1,5 
          
+         MM(1:z_num,1:z_num) = 0
+
          if (kk==1) then
             
             T_iter(1, 1:z_num) = T_last(1:z_num)
+
+            T_new(1:z_num) = T_last(1:z_num)
             
          else
+            
 
-            T_iter(1,1:z_num)=0.5*(T_iter(1,1:z_num)+T_last(1:z_num))
+            !write(*,*) "ok_implicit"
+
+            T_new(1:z_num) = 0.5*(T_last(1:z_num)+Solution(1:z_num,1))
 
          end if
 
-
-         call AppHeatCapacity(z_num,T_iter(1,1:z_num),T_freeze,n,org_ind,Cp,porf,pori)
+         call AppHeatCapacity(z_num,T_new,T_freeze,n,org_ind,Cp_temp,porf,pori)
 
          do ll=1,z_num
-            
-            call ThermalConductivity(ll,n(ll),pori(ll-1),porf(ll-1),org_ind,T_iter(1,ll),Kp(ll))
+
+            call ThermalConductivity(ll,n(ll),pori(ll-1),porf(ll-1),org_ind,T_new(ll),Kp(ll))
             
          end do
-      
+
 
          do ll=2,z_num-1
             
-            Z1 = T_last(ll)
+            Z1 = T_new(ll)
             
-            A=(dt/((dz(ll-1)+dz(ll))*0.5*dz(ll)) * (Kp(ll-1)/Cp(ll)))
-            B=(dt/((dz(ll+1)+dz(ll))*0.5*dz(ll)) * (Kp(ll)/Cp(ll)))
+            A=(dt/((dz(ll-1)+dz(ll))*0.5*dz(ll)) * (Kp(ll-1)/Cp_temp(ll)))
+            B=(dt/((dz(ll+1)+dz(ll))*0.5*dz(ll)) * (Kp(ll)/Cp_temp(ll)))
             C= 1+A+B
 
             MM(ll,ll-1) = -A
             MM(ll,ll) = C
             MM(ll,ll+1) = -B
-            Solution(1,ll) = Z1
+            Solution(ll,1) = Z1
 
          end do
-           
-         Solution(1,z_num)=Tb
+         
+         Solution(1,1) = Tu
+         Solution(z_num,1)=Tb
          MM(z_num,z_num)=1
          MM(1,1)=1
+         !write(*,*) "ok_implicit", Solution
+         !write(*,*) "ok_implicit",MM
 
+         call sgesv(z_num,1,MM,z_num,IPIV,Solution,z_num,info_dgesv) 
+        
+         !write(*,*) "ok_implicit", Solution
+         
       end do
    
+      Timp(1:z_num) = Solution(1:z_num,1)
+
+      !write(*,*) "ok_implicit"
+      
+      !Cp(1:z_num) = Cp_temp(1:z_num)
 
     end subroutine Implicit
 

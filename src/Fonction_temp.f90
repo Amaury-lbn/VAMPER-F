@@ -2,7 +2,7 @@
 
 module Fonction_temp
 
-  use Parametrisation, only : C_ice,C_dry_soil,C_organic,C_water,freezing_range,Latent_Heat,rho_ice
+  use Parametrisation, only : C_ice,C_dry_soil,C_organic,C_water,freezing_range,Latent_Heat,rho_ice,z_num
   use Parametrisation, only :rho_organic,rho_soil,rho_water,K_other_minerals,K_organic,K_quartz,q_quartz
 
   Implicit none
@@ -15,31 +15,33 @@ module Fonction_temp
     implicit none
     integer, intent(in) :: z_num, org_ind
     real, intent(in) :: Tf
-    real, dimension(:), intent(in) :: T,n
-    real, dimension(:), allocatable, intent(out) :: Cp, porf, pori
+    real, dimension(z_num), intent(in) :: T,n
+    real, dimension(z_num), intent(inout) :: Cp
+    real, dimension(z_num), intent(out) ::  porf, pori
     integer :: kk
     real :: dTheta, theta, a, Csoil
     
-    allocate(porf(1:z_num))
-    allocate(pori(1:z_num))
-    allocate(Cp(1:z_num))
+    !allocate(porf(1:z_num))
+    !allocate(pori(1:z_num))
+    !allocate(Cp(1:z_num))
     
     
     if (org_ind > 1) then
+
        Csoil = (1.0 - n(1)) * rho_organic * C_organic
     else
        Csoil = (1.0 - n(1)) * rho_soil * C_dry_soil
     end if
-
     do kk = 1, z_num
        if (kk <= 0) then
           Csoil=((1 - n(kk))* rho_organic * C_organic)
        else
           Csoil= 1 * 10**6 
        end if
+       
        if (T(kk) < Tf) then
           a = - (((T(kk) - Tf) / freezing_range) ** 2.0)
-          theta = 2.71 ** (a)
+          theta = exp(a)
           a = -2.0 / (freezing_range * freezing_range)
           dTheta = a * (T(kk) - Tf) * theta
           porf(kk) = n(kk) * theta
@@ -49,8 +51,10 @@ module Fonction_temp
           porf(kk) = n(kk)
           pori(kk) = 0.0
           Cp(kk) = Csoil + (porf(kk) * C_water * rho_water)
+          
        end if
     end do
+    !write(*,*) "coucou"
   end subroutine AppHeatCapacity
 
 
@@ -61,7 +65,8 @@ module Fonction_temp
     real, intent(out) :: Ther_cond
     real :: Ksoil, Kice, Kfluids
 
-
+    !write(*,*) "coucou", Temp
+    
     if (org_ind > layer) then
 
        Ksoil = K_organic
@@ -70,7 +75,6 @@ module Fonction_temp
 
        Ksoil = (K_quartz ** q_quartz) * (K_other_minerals ** (1.0-q_quartz))
 
-       write(*,*) "coucou", Ksoil
 
     end if
 

@@ -3,10 +3,10 @@ module Parametrisation
   
   Implicit none
 
-  integer,parameter :: TotTime = 451          !temps total en année
+  integer,parameter :: TotTime = 451         !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
   integer,parameter :: YearType = 360         !nombre de jour par an
-  integer,parameter :: z_num = 51             !nombre de couche étudiée
+  integer,parameter :: z_num = 100             !nombre de couche étudiée
   integer,parameter :: EXPE = 1                !de 1 à 4, quelle expérience va être réalisée
   integer,parameter :: GridType = 1           !(1) Log-generated, (2) Linear-generated 
   integer,parameter :: PorosityType = 1       !(1) linéaire, (2)constante, (3)exponentiellement décroissante en fonction de la profondeur

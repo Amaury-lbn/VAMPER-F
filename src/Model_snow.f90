@@ -74,7 +74,7 @@ module Model_snow
       end if
          
       N = 0.5*snw_tot*rho_snow*5.0*10**(-8)*rho_snow*gravity
-      var = 14.643 - 4000/min(Tsnw+273.16,273.16)-0.02*rho_snow
+      var = 14.643 - (4000/min(Tsnw+273.16,273.16))-0.02*rho_snow
       rho_snow_new = rho_snow + N*dt*exp(var)
 
       snw_tot = (rho_snow_old/rho_snow)*snw_tot

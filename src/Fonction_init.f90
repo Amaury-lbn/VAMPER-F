@@ -13,7 +13,7 @@ module Fonction_init
   !Routine paramettrant la porosité du sol en fonction de la profondeur!
 
   subroutine Porosity_init(z_num, Porosity_Type, Depth_layer, Bool_Organic, organic_depth, n, organic_ind)
-    
+
     ! Entrées et sorties !
 
     integer, intent(in) :: z_num, Porosity_Type, Bool_Organic
@@ -33,7 +33,7 @@ module Fonction_init
     allocate(DepthCalcOrg(1:z_num))
     
 
-    
+    !write(*,*) "coucou" 
     if (Bool_organic == 1) then
        
 
@@ -82,7 +82,7 @@ module Fonction_init
 
     end if
 
-
+    !write(*,*) "coucou2"
   end subroutine Porosity_init
 
 
