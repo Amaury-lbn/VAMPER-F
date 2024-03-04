@@ -7,14 +7,14 @@ program test_fonctions
   implicit none
   real, dimension(:), allocatable :: Temp, snw_totals
   real, dimension(:,:), allocatable :: Soil_temp
-  
+  integer :: unit_number
  ! allocate(Soil_temp(1:z_num,1:t_num))
  ! allocate(snw_totals(1:z_num))
  ! allocate(Temp(1:z_num)) 
   !write(*,*) "coucou"
   call Vamper(Temp, Soil_temp, snw_totals)
 
-
+  open(newunit=unit_number,file="/home/users/alambin/VAMPER-F/Resultats/Temp_sol2.txt",status="old",action='write')
 
   !write(*,*) "coucou", dt
 
@@ -40,9 +40,11 @@ program test_fonctions
 
 !  end do
 
-  write(*,*) "coucou", Temp
+  write(unit_number,*) Temp
 
-  !write(*,*) Soil_temp(:,5)
+  write(*,*) Temp
+
+  write(*,*) Soil_temp(:,5)
 
   !write(*,*) snw_totals
 

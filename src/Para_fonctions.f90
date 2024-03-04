@@ -82,8 +82,8 @@ contains
         D(kk)=D(kk-1) + dz(kk)
     end do
 
-    write(*,*) "coucou", dz
-    write(*,*) "coucou", D
+    !write(*,*) "coucou", dz
+    !write(*,*) "coucou", D
     
   end subroutine z_disc
 
