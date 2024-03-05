@@ -54,11 +54,11 @@ module Model_snow
          H_1 = (Tsnw + 273.15)*Cp_snow*snw_tot
          H_2 = rho_water * Latent_heat * swe_tot
 
-         if (H_1<H_2) then
+         if (H_1<=H_2) then
             
             frac_snw = 1-(H_1/H_2)
             write(*,*) frac_snw
-            snw_tot = frac_snw/frac_snw_old * snw_tot
+            snw_tot = (frac_snw/frac_snw_old) * snw_tot
             Tsnw = 0.0
 
          else
@@ -76,7 +76,7 @@ module Model_snow
       end if
          
       N = 0.5*snw_tot*rho_snow*5.0*0.00000001*rho_snow*gravity
-      var = 14.643 - (4000.0/real(min(Tsnw+273.16,273.16)))-0.02*rho_snow
+      var = 14.643 - (4000.0/min(Tsnw+273.16,273.16))-0.02*rho_snow
       rho_snow_new = rho_snow + N*dt*exp(var)
       rho_snow = rho_snow_new
 

@@ -24,6 +24,8 @@ module Fonction_implicit
       real, dimension(z_num) ::Cp_temp, porf_temp, pori_temp, T_new
       real, dimension(z_num+s_l) :: T_iter
       real, dimension(z_num+s_l,z_num+s_l) :: MM
+      real, dimension(z_num+s_l) :: DD
+      real, dimension(z_num+s_l-1) :: DL, DU
       real, dimension(z_num+s_l) :: Knows
       real :: m_Gfx, A, B, C, Z1
       integer :: kk, ll, z_s
@@ -54,7 +56,7 @@ module Fonction_implicit
       n_s(s_l+1:z_s) = n(1:z_num)
       
       Cp_s(1:s_l) = (1.9*1000000.0)*rho_snow/rho_ice
-      K_s(1:s_l) = 2.9*(rho_snow**2)*(10.0**(-6))
+      K_s(1:s_l) = 2.9*(rho_snow**2)*(0.000001)
 
       T_last(1:s_l) = Tsnw
       
@@ -62,10 +64,15 @@ module Fonction_implicit
       do kk=1,5 
          
          MM(1:z_s,1:z_s)=0
+         DD(1:z_s)=0
+         DL(1:z_s-1)=0
+         DU(1:z_s-1)=0
          
          if (kk==1) then
             
             T_iter(1:z_s) = T_last(1:z_s)
+
+           ! write(*,*) T_iter
 
             !T_new(1:z_num) = T_last(1+s_l:z_s)
             
@@ -82,7 +89,8 @@ module Fonction_implicit
          end if
 
 
-         call AppHeatCapacity(z_num,T_iter(s_l+1:z_s),T_freeze,n_s(s_l+1:z_s),org_ind+s_l,Cp_temp,pori_temp,porf_temp)
+         call AppHeatCapacity(z_num,T_iter(s_l+1:z_s),T_freeze,n_s(s_l+1:z_s),org_ind+s_l,Cp_temp,porf_temp,pori_temp)
+         
 
          do ll=s_l+1,z_s
             
@@ -90,7 +98,9 @@ module Fonction_implicit
             
          end do
 
-         Kp_s(1:z_s-1) = (K_s(1:z_s-1)+K_s(2:z_s))/2.0
+         Kp_s(1:z_s-1) = (K_s(1:z_s-1)+K_s(2:z_s))*0.5
+
+        ! write(*,*) K_s 
 
          Knows(1) = Tu
          
@@ -105,6 +115,9 @@ module Fonction_implicit
             MM(ll,ll-1) = -A
             MM(ll,ll) = C
             MM(ll,ll+1) = -B
+            DL(ll-1) = -A
+            DU(ll) = -B
+            DD(ll) = C
             Knows(ll) = Z1
 
          end do
@@ -112,6 +125,9 @@ module Fonction_implicit
          A=(dt/((dz_s(z_s-1)+dz_s(z_s-1))*0.5*dz_s(z_s-1)) * (Kp_s(z_s-1)/Cp_temp(z_num)))
          C=1.0+A
          MM(z_s,z_s-1)=-A
+         DL(z_s-1) = -A
+         DD(z_s) = C
+         DD(1) = C
          MM(z_s,z_s)=C
          MM(1,1) = 1
 
@@ -119,7 +135,8 @@ module Fonction_implicit
          
          
 
-         call sgesv(z_s,1,MM,z_s,IPIV,Knows,z_s,info_dgesv)
+         !call sgesv(z_s,1,MM,z_s,IPIV,Knows,z_s,info_dgesv)
+         call sgtsv(z_s,1,DL,DD,DU,Knows,z_s,info_dgesv)
          
          T_iter(1:z_s) = Knows(1:z_s)
          
@@ -127,7 +144,7 @@ module Fonction_implicit
 
 
       Timp(1:z_num) = T_iter(s_l+1:z_s)
-      
+      !write(*,*) "coucou", Timp
       !write(*,*) "coucou", Solution
 
       Cp(1:z_num) = Cp_temp(1:z_num)
@@ -153,7 +170,8 @@ module Fonction_implicit
       integer :: kk, ll
       real, dimension(z_num) :: T_last, T_new
       real, dimension(z_num) :: T_iter
-
+      real, dimension(z_num) :: DD
+      real, dimension(z_num-1) :: DL, DU
       integer, dimension(z_num) :: IPIV
       integer :: info_dgesv
       
@@ -170,6 +188,9 @@ module Fonction_implicit
       do kk=1,5 
          
          MM(1:z_num,1:z_num) = 0
+         DD(1:z_num)=0
+         DL(1:z_num-1)=0
+         DU(1:z_num-1)=0
 
          if (kk==1) then
             
@@ -186,6 +207,8 @@ module Fonction_implicit
 
          end if
 
+        ! write(*,*) T_iter
+
          call AppHeatCapacity(z_num,T_iter,T_freeze,n,org_ind,Cp_temp,porf,pori)
 
          do ll=1,z_num-1
@@ -201,13 +224,16 @@ module Fonction_implicit
             
             Z1 = T_last(ll)
             
-            A=(dt/((dz(ll-1)+dz(ll))*0.5*dz(ll-1)) * (Kp(ll-1)/Cp_temp(ll)))
+            A=(dt/((dz(ll-1)+dz(ll))*0.5*dz(ll)) * (Kp(ll-1)/Cp_temp(ll)))
             B=(dt/((dz(ll+1)+dz(ll))*0.5*dz(ll)) * (Kp(ll)/Cp_temp(ll)))
             C= 1+A+B
 
             MM(ll,ll-1) = -A
             MM(ll,ll) = C
             MM(ll,ll+1) = -B
+            DL(ll-1) = -A
+            DU(ll) = -B
+            DD(ll) = C
             Knows(ll) = Z1
 
          end do
@@ -216,18 +242,22 @@ module Fonction_implicit
          Knows(z_num)=Tb
          MM(z_num,z_num)=1
          MM(1,1)=1
+         DD(1) = 1
+         DD(z_num) = 1
          !write(*,*) "ok_implicit", Solution
          !write(*,*) "ok_implicit",MM
 
-         call sgesv(z_num,1,MM,z_num,IPIV,Knows,z_num,info_dgesv) 
-         
+         !call sgesv(z_num,1,MM,z_num,IPIV,Knows,z_num,info_dgesv) 
+         call sgtsv(z_num,1,DL,DD,DU,Knows,z_num,info_dgesv) 
          T_iter(1:z_num) = Knows(1:z_num)
          
          !write(*,*) "ok_implicit", Solution
          
       end do
+      
    
       Timp(1:z_num) = T_iter(1:z_num)
+      
 
       !write(*,*) "ok_implicit"
       

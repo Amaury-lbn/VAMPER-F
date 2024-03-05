@@ -18,7 +18,7 @@ module Parametrisation
   real,parameter :: T_init = 0                !température initiale a la surface
   real,parameter :: T_freeze = 0             !température où l'eau est considérée comme gelée
   real,parameter :: freezing_range = 1        
-  real,parameter :: Gfx = 65                  ! flux géothermique de la terre (a modifier peut être)
+  real,parameter :: Gfx = 65.0                  ! flux géothermique de la terre (a modifier peut être)
   real,parameter :: Porosity_soil = 0.5       ! porosité du sol
   real,parameter :: organic_depth = 0.025     ! profondeur de la couche organique
   real,parameter :: n_organic = 0.5           ! porosité de la couche organique

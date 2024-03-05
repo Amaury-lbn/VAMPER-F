@@ -36,7 +36,7 @@ module Fonction_temp
        if (kk <= 0) then
           Csoil=((1 - n(kk))* rho_organic * C_organic)
        else
-          Csoil= 1 * 10**6 
+          Csoil= 1 * 10.0**6 
        end if
        
        if (T(kk) < Tf) then

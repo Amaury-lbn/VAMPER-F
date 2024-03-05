@@ -26,8 +26,8 @@ contains
     end if
 
     
-    model_secs = TotTime*60*60*24*yrs2days
-    dt = Timestep*60*60*24
+    model_secs = real(TotTime)*60.0*60.0*24.0*yrs2days
+    dt = real(Timestep)*60.0*60.0*24.0
     t_num = floor(model_secs/dt)
 
 

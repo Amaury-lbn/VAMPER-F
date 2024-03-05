@@ -44,7 +44,7 @@ program test_fonctions
 
   write(*,*) Temp
 
-  write(*,*) Soil_temp(:,5)
+  !write(*,*) Soil_temp(:,5)
 
   !write(*,*) snw_totals
 
