@@ -5,51 +5,36 @@ program test_fonctions
   use Principal, only : Vamper
 
   implicit none
+  real :: T1,T2, t_temp
   real, dimension(:), allocatable :: Temp, snw_totals
   real, dimension(:,:), allocatable :: Soil_temp
-  integer :: unit_number
- ! allocate(Soil_temp(1:z_num,1:t_num))
- ! allocate(snw_totals(1:z_num))
- ! allocate(Temp(1:z_num)) 
-  !write(*,*) "coucou"
+  integer :: unit_number,kk, ll
+  real, dimension(51) :: Temp_moy
+
   call Vamper(Temp, Soil_temp, snw_totals)
 
-  open(newunit=unit_number,file="/home/users/alambin/VAMPER-F/Resultats/Temp_sol2.txt",status="old",action='write')
+  !open(newunit=unit_number,file="/home/users/alambin/VAMPER-F/Resultats/Temp_sol2.txt",status="old",action='write')
 
-  !write(*,*) "coucou", dt
+  !write(unit_number,*) Temp
 
-!  write(*,*) "coucou", Cp
-  
-!  write(*,*) "coucou", pori
-  
-!  write(*,*) "coucou", porf
+  !write(*,*) Temp
 
-!  do ll = 1,2
+  !write(*,*) Soil_temp
+     
+  do ll=1,51
+     
+     do kk=1,12
+     
+        t_temp = t_temp + Soil_temp(ll,kk)
+     
+     end do
 
-!     call AppHeatCapacity(z_num,T,T_freeze,n, organic_ind, Cp, porf, pori)
- 
-!     do kk=1,z_num-1
-!
-!     h_pori(kk) = (pori(kk) + pori(kk+1))/2
-!     h_porf(kk) = (porf(kk) + porf(kk+1))/2
-!     h_n(kk) = (n(kk) + n(kk+1))/2
+     Temp_moy(ll) = t_temp/12.0
+      write(*,*) Temp_moy(ll)
+     t_temp = 0.0
 
-!     call ThermalConductivity(kk,h_n(kk),h_pori(kk),h_porf(kk), organic_ind, T(kk), Kp(kk))
-
-!     end do
-
-!  end do
-
-  write(unit_number,*) Temp
+  end do
 
   write(*,*) Temp
-
-  !write(*,*) Soil_temp(:,5)
-
-  !write(*,*) snw_totals
-
- ! write(*,*) "coucou", Soil_temp
-
-  !write(*,*) "coucou", snw_totals
-
+  
  end program test_fonctions

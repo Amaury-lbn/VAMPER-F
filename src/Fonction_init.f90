@@ -31,9 +31,7 @@ module Fonction_init
 
     allocate(n(1:z_num))
     allocate(DepthCalcOrg(1:z_num))
-    
-
-    !write(*,*) "coucou" 
+     
     if (Bool_organic == 1) then
        
 
@@ -82,7 +80,6 @@ module Fonction_init
 
     end if
 
-    !write(*,*) "coucou2"
   end subroutine Porosity_init
 
 

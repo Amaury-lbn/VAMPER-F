@@ -21,12 +21,11 @@ module Model_snow
          snw_f = swe_f * (rho_water/rho_snow_freeze)
          snw_tot = snw_tot + snw_f
          swe_tot = swe_tot + swe_f
-         !write(*,*) swe_tot
-         !write(*,*) snw_tot
+
          if (snw_tot > 0.000001) then
             
             rho_snow = swe_tot*rho_water/snw_tot
-            !write(*,*) rho_snow
+
          else
             
             rho_snow = rho_snow_freeze

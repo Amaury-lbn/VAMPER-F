@@ -39,15 +39,11 @@ module Fonction_implicit
       allocate(porf(1:z_num+s_l))
       allocate(pori(1:z_num+s_l))
       allocate(Cp_s(1:z_num+s_l))
-      !allocate(Cp_temp(1:z_num))
-      !allocate(porf_temp(1:z_num))
-      !allocate(pori_temp(1:z_num))
 
       
       z_s = z_num+s_l
       m_Gfx = Gfx/1000.0
 
-      
 
       T_last(s_l+1:z_s) = T_old(1:z_num)
       dz_s(1:s_l) = snw_dp
@@ -71,20 +67,10 @@ module Fonction_implicit
          if (kk==1) then
             
             T_iter(1:z_s) = T_last(1:z_s)
-
-           ! write(*,*) T_iter
-
-            !T_new(1:z_num) = T_last(1+s_l:z_s)
             
          else
 
             T_iter(1:z_s)=0.5*(T_iter(1:z_s)+T_last(1:z_s))
-
-            !T_new(1:z_num) = 0.5*(T_last(1+s_l:z_s)+Solution(1+s_l:z_s))
-
-            !T_last(1:z_s) = 0.5*(T_last(1:z_s)+Solution(1:z_s))
-
-            !write(*,*) "coucou",T_new
 
          end if
 
@@ -99,8 +85,6 @@ module Fonction_implicit
          end do
 
          Kp_s(1:z_s-1) = (K_s(1:z_s-1)+K_s(2:z_s))*0.5
-
-        ! write(*,*) K_s 
 
          Knows(1) = Tu
          
@@ -118,6 +102,7 @@ module Fonction_implicit
             DL(ll-1) = -A
             DU(ll) = -B
             DD(ll) = C
+
             Knows(ll) = Z1
 
          end do
@@ -125,11 +110,11 @@ module Fonction_implicit
          A=(dt/((dz_s(z_s-1)+dz_s(z_s-1))*0.5*dz_s(z_s-1)) * (Kp_s(z_s-1)/Cp_temp(z_num)))
          C=1.0+A
          MM(z_s,z_s-1)=-A
+         MM(z_s,z_s)=C
+         MM(1,1) = 1
          DL(z_s-1) = -A
          DD(z_s) = C
          DD(1) = C
-         MM(z_s,z_s)=C
-         MM(1,1) = 1
 
          Knows(z_s) = T_last(z_s) + ((dt/Cp_temp(z_num))*m_Gfx/dz_s(z_s-1))
          
@@ -144,8 +129,6 @@ module Fonction_implicit
 
 
       Timp(1:z_num) = T_iter(s_l+1:z_s)
-      !write(*,*) "coucou", Timp
-      !write(*,*) "coucou", Solution
 
       Cp(1:z_num) = Cp_temp(1:z_num)
       Kp(1:z_num) = K_s(s_l+1:z_s)
@@ -178,11 +161,7 @@ module Fonction_implicit
       m_Gfx = gfx/1000.0
 
       allocate(Timp(1:z_num))
-      !allocate(Cp(1:z_num))
       allocate(Kp(1:z_num))
-      !allocate(pori(1:z_num))
-      !allocate(porf(1:z_num))
-      !write(*,*) "coucou"
       T_last(1:z_num) = T_old(1:z_num)
  
       do kk=1,5 
@@ -195,19 +174,12 @@ module Fonction_implicit
          if (kk==1) then
             
             T_iter(1:z_num) = T_last(1:z_num)
-
-            !T_new(1:z_num) = T_last(1:z_num)
             
          else
-            
-
-            !write(*,*) "ok_implicit"
 
             T_iter(1:z_num) = 0.5*(T_iter(1:z_num)+T_last(1:z_num))
 
          end if
-
-        ! write(*,*) T_iter
 
          call AppHeatCapacity(z_num,T_iter,T_freeze,n,org_ind,Cp_temp,porf,pori)
 
@@ -244,24 +216,15 @@ module Fonction_implicit
          MM(1,1)=1
          DD(1) = 1
          DD(z_num) = 1
-         !write(*,*) "ok_implicit", Solution
-         !write(*,*) "ok_implicit",MM
 
          !call sgesv(z_num,1,MM,z_num,IPIV,Knows,z_num,info_dgesv) 
          call sgtsv(z_num,1,DL,DD,DU,Knows,z_num,info_dgesv) 
          T_iter(1:z_num) = Knows(1:z_num)
          
-         !write(*,*) "ok_implicit", Solution
-         
       end do
       
    
       Timp(1:z_num) = T_iter(1:z_num)
-      
-
-      !write(*,*) "ok_implicit"
-      
-      !Cp(1:z_num) = Cp_temp(1:z_num)
 
     end subroutine Implicit
 

@@ -3,15 +3,16 @@ module Parametrisation
   
   Implicit none
 
-  integer,parameter :: TotTime = 451         !temps total en année
+  integer,parameter :: TotTime = 3000         !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
   integer,parameter :: YearType = 360         !nombre de jour par an
   integer,parameter :: z_num = 51             !nombre de couche étudiée
   integer,parameter :: EXPE = 1                !de 1 à 4, quelle expérience va être réalisée
   integer,parameter :: GridType = 1           !(1) Log-generated, (2) Linear-generated 
-  integer,parameter :: PorosityType = 1       !(1) linéaire, (2)constante, (3)exponentiellement décroissante en fonction de la profondeur
+  integer,parameter :: PorosityType = 1       !(1) linéaire, (autre) exponentiellement décroissante en fonction de la profondeur
   integer,parameter :: Bool_Snow = 1          ! forçage en neige ou non (1 ou 0)
   integer,parameter :: Bool_Organic = 1       ! prise en compte de la couche organique ou non (1 ou 0)
+  integer, parameter :: EQ_Tr = 0
 
 
   real,parameter :: Depth = 1000.0              !profondeur de la modélisation

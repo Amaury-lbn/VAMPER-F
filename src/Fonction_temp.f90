@@ -21,10 +21,6 @@ module Fonction_temp
     integer :: kk
     real :: dTheta, theta, a, Csoil
     
-    !allocate(porf(1:z_num))
-    !allocate(pori(1:z_num))
-    !allocate(Cp(1:z_num))
-    
     
     if (org_ind > 1) then
 
@@ -53,8 +49,9 @@ module Fonction_temp
           Cp(kk) = Csoil + (porf(kk) * C_water * rho_water)
           
        end if
+
     end do
-    !write(*,*) "coucou"
+
   end subroutine AppHeatCapacity
 
 
@@ -64,8 +61,6 @@ module Fonction_temp
     real, intent(in) :: h_n, h_pori, h_porf, Temp
     real, intent(out) :: Ther_cond
     real :: Ksoil, Kice, Kfluids
-
-    !write(*,*) "coucou", Temp
     
     if (org_ind > layer) then
 
