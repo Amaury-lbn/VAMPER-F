@@ -3,16 +3,20 @@ module Parametrisation
   
   Implicit none
 
-  integer,parameter :: TotTime = 3000         !temps total en année
+  integer,parameter :: TotTime = 50000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
+  integer, parameter :: t_fin=0
   integer,parameter :: YearType = 360         !nombre de jour par an
   integer,parameter :: z_num = 51             !nombre de couche étudiée
   integer,parameter :: EXPE = 1                !de 1 à 4, quelle expérience va être réalisée
   integer,parameter :: GridType = 1           !(1) Log-generated, (2) Linear-generated 
-  integer,parameter :: PorosityType = 1       !(1) linéaire, (autre) exponentiellement décroissante en fonction de la profondeur
+  integer,parameter :: PorosityType = 3       !(1) linéaire, (autre) exponentiellement décroissante en fonction de la profondeur
   integer,parameter :: Bool_Snow = 1          ! forçage en neige ou non (1 ou 0)
   integer,parameter :: Bool_Organic = 1       ! prise en compte de la couche organique ou non (1 ou 0)
   integer, parameter :: EQ_Tr = 0
+  integer, parameter :: EQ1_EQ2 = 0
+  integer, parameter :: Bool_delta = 0
+  integer, parameter :: Bool_glacial = 1
 
 
   real,parameter :: Depth = 1000.0              !profondeur de la modélisation
@@ -24,7 +28,7 @@ module Parametrisation
   real,parameter :: organic_depth = 0.025     ! profondeur de la couche organique
   real,parameter :: n_organic = 0.5           ! porosité de la couche organique
   real,parameter :: n_soil_bot = 0.5          ! porosité en bas de la couche de sol
-
+  real,parameter :: alpha = -12.0
 
   !       DENSITÉ DE DIFFÉRENTES MATIÈRES (en kg/m³) ! 
 

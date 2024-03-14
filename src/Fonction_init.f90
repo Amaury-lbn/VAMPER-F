@@ -70,6 +70,14 @@ module Fonction_init
 
        end do
 
+    elseif(Porosity_Type == 2) then
+
+       do pas_z = organic_ind, z_num
+          
+          n(pas_z) = Porosity_soil
+
+       end do
+
     else
        
        do pas_z = organic_ind, z_num
@@ -104,6 +112,37 @@ module Fonction_init
 
 
   end subroutine GeoHeatFlow
+
+
+  subroutine Glacial_index(time_gi, glacial_ind, nb_lines)
+    
+    real,dimension(:),allocatable,intent(out) :: time_gi, glacial_ind
+    integer,intent(out) :: nb_lines
+    integer :: unit_number4,ll
+    real :: time_temp, niveau_eau,glacial_ind_temp,kk
+    character(len=8) :: char
+
+
+    open(newunit=unit_number4,file="/home/users/alambin/VAMPER-F/Donnee/Glacial_index.txt",status="old",action='read') 
+    
+    read(unit_number4,*) char, nb_lines
+
+    write(*,*) nb_lines
+    
+    allocate(time_gi(1:nb_lines))
+    allocate(glacial_ind(1:nb_lines))
+
+    do ll=1,nb_lines-1
+
+       read(unit_number4,*) time_temp,niveau_eau,glacial_ind_temp,kk
+
+       glacial_ind(ll) = glacial_ind_temp
+       time_gi(ll) = time_temp
+
+    end do
+
+
+  end subroutine Glacial_index
 
 
 end module Fonction_init

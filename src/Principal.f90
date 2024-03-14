@@ -1,10 +1,10 @@
 module Principal
 
 
-  use Parametrisation, only : z_num,TotTime,Timestep,YearType,z_num,Depth,GridType,PorosityType,T_init
-  use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr
+  use Parametrisation, only : z_num,TotTime,Timestep,YearType,z_num,Depth,GridType,PorosityType,T_init,Bool_glacial
+  use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr, EQ1_EQ2, Bool_delta,t_fin, alpha
   use Fonction_temp, only : AppHeatCapacity, ThermalConductivity
-  use Fonction_init, only : Porosity_init, GeoHeatFlow
+  use Fonction_init, only : Porosity_init, GeoHeatFlow, Glacial_index
   use Para_fonctions, only : t_disc, z_disc
   use Model_snow, only : snw_average, snw_proc
   use Fonction_implicit, only : Implicit_snow, Implicit
@@ -14,15 +14,16 @@ module Principal
 contains
 
   subroutine Vamper(Temp, Soil_temp, snw_totals)
-    integer :: spy, unit_number_1, unit_number_2,  unit_number_3
+    integer :: spy, unit_number_1, unit_number_2,  unit_number_3,  unit_number_4
     real :: dt, Cp_snow, frac_snw, K_s, rho_snow, snw_tot, swe_f, Tb, snw_dp, swe_tot, Tsnw, T_soil
-    integer :: t_num, kk, organic_ind, ll
+    integer :: t_num, kk, organic_ind, ll, nb_lines
     real, dimension(z_num) :: T_old, Cp, porf, pori
     real, dimension(z_num-1) ::  h_n, h_pori, h_porf
     real, dimension(:),allocatable,intent(out) :: Temp
     real, dimension(:,:),allocatable,intent(out) :: Soil_temp
     real, dimension(:),allocatable,intent(out) :: snw_totals
-    real, dimension(:),allocatable:: T_air, Timp, Kp, n, dz, D, Cp_t, swe_f_t
+    real, dimension(:),allocatable:: T_air, Timp, Kp, n, dz, D, Cp_t, swe_f_t, time_gi,glacial_ind
+    real, dimension(:,:),allocatable:: delta_T
     character(len=20) :: ligne
     
     call t_disc(TotTime,Timestep,YearType,dt,spy,t_num)
@@ -39,7 +40,12 @@ contains
     end if
     allocate(Kp(1:z_num-1))
     allocate(Temp(1:z_num))
-    
+
+    if (Bool_delta==1)then
+
+       allocate(delta_T(1:z_num,1:t_num-1))
+
+    end if
     
     Tsnw = -4.0
     frac_snw = 1.0
@@ -50,13 +56,14 @@ contains
 
     if (EQ_Tr == 0)then
     
-       open(newunit=unit_number_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ_NoPF_Porolin.txt",status="old",action='read') 
+       open(newunit=unit_number_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ_NoPF.txt",status="old",action='read') 
        open(newunit=unit_number_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ.txt",status="old",action='read')
        open(newunit=unit_number_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
+       open(newunit=unit_number_4,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
 
     else
 
-       open(newunit=unit_number_3,file="/home/users/alambin/VAMPER-F/Donnee/Timp.txt",status="old",action='read')
+       open(newunit=unit_number_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ_100k_3k.txt",status="old",action='read')
        open(newunit=unit_number_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EXP1.txt",status="old",action='read')
        open(newunit=unit_number_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EXP1.txt",status="old",action='read')
 
@@ -71,23 +78,44 @@ contains
        Kp(kk)=2
           
     end do
-       
+
+    if (Bool_glacial == 1)then
+
+       call Glacial_index(time_gi,glacial_ind,nb_lines)
+       call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)
+       write(*,*) Temp
+
+    end if
+
     if (EQ_Tr == 0)then
        
-       call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)
+      
        
        do ll =1,12
+          
+          if (Bool_glacial == 1)then
+             read(unit_number_4,*) T_air(ll)
+          else
+             read(unit_number_1,*) T_air(ll)
+          end if
 
-          read(unit_number_1,*) T_air(ll)
           read(unit_number_2,*) swe_f_t(ll)
           
        end do
+       
+       if (EQ1_EQ2 ==1 ) then
+          
+          call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)
 
-       !do ll =1,z_num
+       elseif(EQ1_EQ2==2)then
 
-        !  read(unit_number_3,*) Temp(ll)
+          do ll =1,z_num
 
-       !end do
+             read(unit_number_3,*) Temp(ll)
+
+          end do
+
+       end if
     else
 
        do ll =1,z_num
@@ -121,21 +149,40 @@ contains
        
     end do
 
+    if (Bool_delta==1)then
+       delta_t(1:z_num,1) = Temp(1:z_num)
+    end if
+             
 
-    do ll=2,t_num+9
+    do ll=2,t_num
        
-       write(*,*) ll
+       !write(*,*)  T_air(mod(ll,12)+1)+9.0
        
 
        if (EQ_Tr == 0)then
+          
+          if (EQ1_EQ2 == 1)then
+             T_soil = T_air(mod(ll,12)+1)+9.0
+          elseif (EQ1_EQ2==2)then
+             T_soil = T_air(mod(ll,12)+1)
+          end if
 
-          T_soil = T_air(mod(ll,12)+1)+9.0
           swe_f = swe_f_t(mod(ll,12)+1)
           
        else
 
           read(unit_number_1,*) T_air(ll)
           read(unit_number_2,*) swe_f
+
+       end if
+
+       if (Bool_glacial==1)then
+
+          !write(*,*) "ok", ll
+
+          T_soil = T_air(mod(ll,12)+1) + alpha * glacial_ind(nb_lines-floor((t_fin+TotTime)/100.0)+floor(ll/1200.0))
+
+          !write(*,*) "ok", T_soil
 
        end if
 
@@ -198,10 +245,28 @@ contains
          end if
     
        end if
+
+       !write(*,*) ll, T_soil, nb_lines-floor((t_fin+TotTime)/100.0)+floor(ll/1200.0)
           
        do kk=1,z_num
+          
+          if (EQ_Tr==0) then
 
-          Soil_temp(kk,mod(ll,12)+1) = Temp(kk)
+             Soil_temp(kk,mod(ll,12)+1) = Temp(kk)
+
+             if (Bool_delta==1)then
+                delta_t(kk,ll) = Temp(kk) - T_old(kk)
+             end if
+
+          else
+             
+             Soil_temp(kk,ll) = Temp(kk)
+             
+             if (Bool_delta==1)then
+                delta_t(kk,ll) = Temp(kk) - T_old(kk)
+             end if
+
+          end if
 
        end do
 
@@ -209,8 +274,10 @@ contains
        
     end do
 
-
-
+    if (Bool_delta==1)then
+       write(*,*) delta_t(1:z_num,2)
+       write(*,*) delta_t(1:z_num,35000) 
+    end if
 
   end subroutine Vamper
   
