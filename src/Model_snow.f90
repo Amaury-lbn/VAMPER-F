@@ -52,14 +52,14 @@ module Model_snow
          
          H_1 = (Tsnw + 273.15)*Cp_snow*snw_tot
          H_2 = rho_water * Latent_heat * swe_tot
-
+         !write(*,*) H_1-H_2
          if (H_1<=H_2) then
             
             frac_snw = 1-(H_1/H_2)
             write(*,*) frac_snw
             snw_tot = (frac_snw/frac_snw_old) * snw_tot
             Tsnw = 0.0
-
+            write(*,*) "H1<H2"
          else
             
             frac_snw = 0.0

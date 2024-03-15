@@ -3,7 +3,7 @@ module Parametrisation
   
   Implicit none
 
-  integer,parameter :: TotTime = 50000       !temps total en année
+  integer,parameter :: TotTime = 400000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
   integer, parameter :: t_fin=0
   integer,parameter :: YearType = 360         !nombre de jour par an
@@ -15,7 +15,7 @@ module Parametrisation
   integer,parameter :: Bool_Organic = 1       ! prise en compte de la couche organique ou non (1 ou 0)
   integer, parameter :: EQ_Tr = 0
   integer, parameter :: EQ1_EQ2 = 0
-  integer, parameter :: Bool_delta = 0
+  integer, parameter :: Bool_delta = 1
   integer, parameter :: Bool_glacial = 1
 
 

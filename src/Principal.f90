@@ -14,10 +14,10 @@ module Principal
 contains
 
   subroutine Vamper(Temp, Soil_temp, snw_totals)
-    integer :: spy, unit_number_1, unit_number_2,  unit_number_3,  unit_number_4
+    integer :: spy, unit_number_1, unit_number_2,  unit_number_3,  unit_number_4, indice_tab
     real :: dt, Cp_snow, frac_snw, K_s, rho_snow, snw_tot, swe_f, Tb, snw_dp, swe_tot, Tsnw, T_soil
     integer :: t_num, kk, organic_ind, ll, nb_lines
-    real, dimension(z_num) :: T_old, Cp, porf, pori
+    real, dimension(z_num) :: T_old, Cp, porf, pori, Soil_temp_moy, delta_t_moy
     real, dimension(z_num-1) ::  h_n, h_pori, h_porf
     real, dimension(:),allocatable,intent(out) :: Temp
     real, dimension(:,:),allocatable,intent(out) :: Soil_temp
@@ -33,6 +33,7 @@ contains
        allocate(T_air(1:12))
        allocate(Soil_temp(1:z_num,1:12))
        allocate(swe_f_t(1:12))
+       
     else
        allocate(Soil_temp(1:z_num,1:t_num))
        allocate(snw_totals(1:t_num))
@@ -55,8 +56,12 @@ contains
 
 
     if (EQ_Tr == 0)then
-    
-       open(newunit=unit_number_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ_NoPF.txt",status="old",action='read') 
+       
+       if(Bool_glacial==1)then
+          open(newunit=unit_number_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0_x2.txt",status="old",action='read') 
+       else
+          open(newunit=unit_number_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ_NoPF.txt",status="old",action='read') 
+       end if
        open(newunit=unit_number_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ.txt",status="old",action='read')
        open(newunit=unit_number_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
        open(newunit=unit_number_4,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
@@ -82,7 +87,11 @@ contains
     if (Bool_glacial == 1)then
 
        call Glacial_index(time_gi,glacial_ind,nb_lines)
-       call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)
+       do ll =1,z_num
+
+          read(unit_number_3,*) Temp(ll)
+
+       end do
        write(*,*) Temp
 
     end if
@@ -106,6 +115,7 @@ contains
        if (EQ1_EQ2 ==1 ) then
           
           call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)
+          write(*,*) Temp
 
        elseif(EQ1_EQ2==2)then
 
@@ -114,6 +124,7 @@ contains
              read(unit_number_3,*) Temp(ll)
 
           end do
+          
 
        end if
     else
@@ -128,7 +139,7 @@ contains
        read(unit_number_2,*) swe_f
        
     end if
-
+    write(*,*) sum(T_air)/12.0
     write(*,*) "ok"
 
     Tb = Temp(z_num)
@@ -162,12 +173,12 @@ contains
        if (EQ_Tr == 0)then
           
           if (EQ1_EQ2 == 1)then
-             T_soil = T_air(mod(ll,12)+1)+9.0
+             T_soil = (T_air(mod(ll,12)+1)+7.71484184)
           elseif (EQ1_EQ2==2)then
              T_soil = T_air(mod(ll,12)+1)
           end if
 
-          swe_f = swe_f_t(mod(ll,12)+1)
+          swe_f = swe_f_t(mod(ll,12))
           
        else
 
@@ -179,8 +190,9 @@ contains
        if (Bool_glacial==1)then
 
           !write(*,*) "ok", ll
-
-          T_soil = T_air(mod(ll,12)+1) + alpha * glacial_ind(nb_lines-floor((t_fin+TotTime)/100.0)+floor(ll/1200.0))
+          indice_tab = nb_lines-floor((-(ll/12.0)+t_fin+TotTime)/100.0)
+          T_soil=alpha*(glacial_ind(indice_tab-1)+mod((ll/12.0),100.0)*(glacial_ind(indice_tab)-glacial_ind(indice_tab-1))/100.0)
+          T_soil = T_air(mod(ll,12)+1)+T_soil
 
           !write(*,*) "ok", T_soil
 
@@ -246,7 +258,7 @@ contains
     
        end if
 
-       !write(*,*) ll, T_soil, nb_lines-floor((t_fin+TotTime)/100.0)+floor(ll/1200.0)
+       !write(*,*) ll, T_soil
           
        do kk=1,z_num
           
@@ -270,14 +282,33 @@ contains
 
        end do
 
-       !snw_totals(ll) = snw_tot
+       !write(*,*) snw_tot
+
+       if (Bool_glacial == 1) then
+          
+          if (mod(ll,240000) == 0) then
+
+             do kk=1,z_num
+                
+                Soil_temp_moy(kk) = sum(Soil_temp(kk,1:12))/12.0
+
+                if (Bool_delta==1)then
+
+                   delta_t_moy(kk)=sum(delta_t(kk,(ll-11):ll))
+
+                end if
+                
+             end do
+             write(*,*) ll
+             write(*,*) "Soil_temp_moy =" , Soil_temp_moy
+             !write(*,*) "delta_t_moy =" , delta_t_moy 
+
+          end if
+
+       end if
        
     end do
 
-    if (Bool_delta==1)then
-       write(*,*) delta_t(1:z_num,2)
-       write(*,*) delta_t(1:z_num,35000) 
-    end if
 
   end subroutine Vamper
   

@@ -40,17 +40,16 @@ program test_fonctions
      end do
 
      Temp_moy(ll) = t_temp/12.0
-     write(*,*) Temp_moy(ll)
      t_temp = 0.0
 
   end do
-
+  write(*,*) "Temp_moy = " , Temp_moy
   do kk=1,12
      
-  write(*,*) "Nouveau mois",Soil_temp (:,kk)
+  !write(*,*) "Nouveau mois",Soil_temp (:,kk)
      
   end do
   
- write(*,*) Temp
+ !write(*,*) Temp
 
  end program test_fonctions
