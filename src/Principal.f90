@@ -62,6 +62,7 @@ contains
        else
           open(newunit=unit_number_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ_NoPF.txt",status="old",action='read') 
        end if
+
        open(newunit=unit_number_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ.txt",status="old",action='read')
        open(newunit=unit_number_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
        open(newunit=unit_number_4,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
@@ -139,6 +140,7 @@ contains
        read(unit_number_2,*) swe_f
        
     end if
+
     write(*,*) sum(T_air)/12.0
     write(*,*) "ok"
 
@@ -178,7 +180,7 @@ contains
              T_soil = T_air(mod(ll,12)+1)
           end if
 
-          swe_f = swe_f_t(mod(ll,12))
+          swe_f = swe_f_t(mod(ll,12)+1)
           
        else
 
@@ -192,7 +194,10 @@ contains
           !write(*,*) "ok", ll
           indice_tab = nb_lines-floor((-(ll/12.0)+t_fin+TotTime)/100.0)
           T_soil=alpha*(glacial_ind(indice_tab-1)+mod((ll/12.0),100.0)*(glacial_ind(indice_tab)-glacial_ind(indice_tab-1))/100.0)
+          !write(*,*) "ok", T_soil
           T_soil = T_air(mod(ll,12)+1)+T_soil
+
+          !T_soil = T_air(mod(ll,12)+1) + alpha*glacial_ind(indice_tab)
 
           !write(*,*) "ok", T_soil
 
@@ -238,7 +243,8 @@ contains
 
           end if
 
-          
+          !write(*,*) Cp_snow
+
           call snw_proc(Tsnw, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
           
        else
@@ -286,7 +292,7 @@ contains
 
        if (Bool_glacial == 1) then
           
-          if (mod(ll,240000) == 0) then
+          if (mod(ll,12000) == 0) then
 
              do kk=1,z_num
                 
