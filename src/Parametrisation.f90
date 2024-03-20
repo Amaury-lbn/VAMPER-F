@@ -6,7 +6,7 @@ module Parametrisation
   integer,parameter :: TotTime = 10000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
   integer, parameter :: t_fin=0
-  integer,parameter :: YearType = 360         !nombre de jour par an
+  integer,parameter :: YearType = 365         !nombre de jour par an
   integer,parameter :: z_num = 51             !nombre de couche étudiée
   integer,parameter :: EXPE = 1                !de 1 à 4, quelle expérience va être réalisée
   integer,parameter :: GridType = 1           !(1) Log-generated, (2) Linear-generated 
@@ -16,7 +16,9 @@ module Parametrisation
   integer, parameter :: EQ_Tr = 0
   integer, parameter :: EQ1_EQ2 = 0
   integer, parameter :: Bool_delta = 0
-  integer, parameter :: Bool_glacial = 1
+  integer, parameter :: Bool_glacial = 0
+  integer, parameter :: Bool_1998 = 1 
+  integer, parameter :: Bool_layer_temp = 1 
 
 
   real,parameter :: Depth = 1000.0              !profondeur de la modélisation

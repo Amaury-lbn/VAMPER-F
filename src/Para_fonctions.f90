@@ -1,5 +1,7 @@
 module Para_fonctions
 
+use Parametrisation, only : Bool_1998
+
 Implicit none
 
 contains
@@ -27,7 +29,11 @@ contains
 
     
     model_secs = real(TotTime)*60.0*60.0*24.0*yrs2days
-    dt = real(Timestep)*60.0*60.0*24.0
+    if (Bool_1998 == 0)then
+       dt = real(Timestep)*60.0*60.0*24.0
+    else
+       dt = 60.0*60.0*24.0
+    end if
     t_num = floor(model_secs/dt)
 
 
