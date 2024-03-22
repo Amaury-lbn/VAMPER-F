@@ -6,31 +6,32 @@ module Parametrisation
   integer,parameter :: TotTime = 10000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
   integer, parameter :: t_fin=0
-  integer,parameter :: YearType = 365         !nombre de jour par an
-  integer,parameter :: z_num = 51             !nombre de couche étudiée
+  integer,parameter :: YearType = 365        !nombre de jour par an
+  integer,parameter :: z_num = 101             !nombre de couche étudiée
   integer,parameter :: EXPE = 1                !de 1 à 4, quelle expérience va être réalisée
   integer,parameter :: GridType = 1           !(1) Log-generated, (2) Linear-generated 
   integer,parameter :: PorosityType = 3       !(1) linéaire, (autre) exponentiellement décroissante en fonction de la profondeur
   integer,parameter :: Bool_Snow = 1          ! forçage en neige ou non (1 ou 0)
   integer,parameter :: Bool_Organic = 1       ! prise en compte de la couche organique ou non (1 ou 0)
-  integer, parameter :: EQ_Tr = 0
-  integer, parameter :: EQ1_EQ2 = 0
-  integer, parameter :: Bool_delta = 0
-  integer, parameter :: Bool_glacial = 0
-  integer, parameter :: Bool_1998 = 1 
-  integer, parameter :: Bool_layer_temp = 1 
+  integer, parameter :: EQ_Tr = 0             ! Equilibrum run (0) or Transient run (1) -> using different forcing Temperature and snow
+  integer, parameter :: EQ1_EQ2 = 2           ! EQ1(1) initial temperature calculated with the Geothermal heat flux. EQ2 initial temperature read in a file .txt
+  integer, parameter :: Bool_delta = 0        ! 
+  integer, parameter :: Bool_glacial = 1          ! Using glacial index to modify air temperature
+  integer, parameter :: Bool_layer_temp = 1       ! Creation of .txt with the temperature of the soil at different layer
+  integer, parameter :: Forcage_Month_day = 1     ! (1) Daily or (0) monthly forcing
+  integer, parameter :: Bool_Swe_Snw = 1
 
 
   real,parameter :: Depth = 1000.0              !profondeur de la modélisation
   real,parameter :: T_init = 0                !température initiale a la surface
   real,parameter :: T_freeze = 0             !température où l'eau est considérée comme gelée
-  real,parameter :: freezing_range = 1        
+  real,parameter :: freezing_range = 1        ! Temperature at wich the snow start to melt
   real,parameter :: Gfx = 65.0                  ! flux géothermique de la terre (a modifier peut être)
   real,parameter :: Porosity_soil = 0.5       ! porosité du sol
   real,parameter :: organic_depth = 0.025     ! profondeur de la couche organique
   real,parameter :: n_organic = 0.5           ! porosité de la couche organique
   real,parameter :: n_soil_bot = 0.5          ! porosité en bas de la couche de sol
-  real,parameter :: alpha = -15.0
+  real,parameter :: alpha = -13.0
 
   !       DENSITÉ DE DIFFÉRENTES MATIÈRES (en kg/m³) ! 
 

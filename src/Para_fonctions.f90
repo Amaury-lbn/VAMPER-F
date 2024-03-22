@@ -1,6 +1,6 @@
 module Para_fonctions
 
-use Parametrisation, only : Bool_1998
+use Parametrisation, only : Forcage_Month_Day
 
 Implicit none
 
@@ -29,9 +29,9 @@ contains
 
     
     model_secs = real(TotTime)*60.0*60.0*24.0*yrs2days
-    if (Bool_1998 == 0)then
+    if (Forcage_Month_Day == 0)then
        dt = real(Timestep)*60.0*60.0*24.0
-    else
+    elseif(Forcage_Month_Day == 1)then
        dt = 60.0*60.0*24.0
     end if
     t_num = floor(model_secs/dt)

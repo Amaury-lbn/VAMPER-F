@@ -8,8 +8,8 @@ module Model_snow
 
   contains
 
-
-    subroutine snw_average(swe_f, swe_tot, snw_tot, rho_snow)
+    
+    subroutine snw_average_swe(swe_f, swe_tot, snw_tot, rho_snow)
       
       real, intent(in) :: swe_f
       real, intent(inout) :: swe_tot, snw_tot, rho_snow
@@ -35,7 +35,36 @@ module Model_snow
       end if
 
 
-    end subroutine snw_average
+    end subroutine snw_average_swe
+
+
+    subroutine snw_average_snw(snw_f, swe_tot, snw_tot, rho_snow,swe_f)
+      
+      real, intent(in) :: snw_f
+      real, intent(inout) :: swe_tot, snw_tot, rho_snow, swe_f
+
+      
+      
+      if (snw_f > 0.000001) then
+
+         swe_f = snw_f * (rho_snow_freeze/rho_water)
+         snw_tot = snw_tot + snw_f
+         swe_tot = swe_tot + swe_f
+
+         if (snw_tot > 0.000001) then
+            
+            rho_snow = swe_tot*rho_water/snw_tot
+
+         else
+            
+            rho_snow = rho_snow_freeze
+
+         end if
+
+      end if
+
+
+    end subroutine snw_average_snw
 
 
     subroutine snw_proc(Tsnw, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)

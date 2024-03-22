@@ -51,7 +51,7 @@ module Fonction_implicit
       dz_s(s_l+1:z_s) = dz(1:z_num)
       n_s(s_l+1:z_s) = n(1:z_num)
       
-      Cp_s(1:s_l) = (1.9*1000000.0)*rho_snow/rho_ice
+      Cp_s(1:s_l) = (2.108*1000000.0)*rho_snow/rho_ice
       K_s(1:s_l) = 2.9*(rho_snow**2)*0.000001
 
       T_last(1:s_l) = Tsnw

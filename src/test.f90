@@ -50,6 +50,6 @@ program test_fonctions
      
   end do
   
- !write(*,*) Temp
+  write(*,*) Temp
 
  end program test_fonctions
