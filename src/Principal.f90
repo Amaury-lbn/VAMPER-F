@@ -22,7 +22,7 @@ contains
 
     character(len=20) :: ligne
     integer, dimension(12) :: Day_per_month
-    real, dimension(365*20) :: T_layer23,T_layer53,T_layer93,T_layer143,T_layer250,T_layer350,T_layer550,T_layer900
+    real, dimension(:),allocatable :: T_layer23,T_layer53,T_layer93,T_layer143,T_layer250,T_layer350,T_layer550,T_layer900
     real, dimension(z_num) :: T_old, Cp, porf, pori, Soil_temp_moy, delta_t_moy
     real, dimension(z_num-1) ::  h_n, h_pori, h_porf
 
@@ -33,8 +33,8 @@ contains
     real, dimension(:),allocatable,intent(out) :: snw_totals
 
 
-    call t_disc(TotTime,Timestep,YearType,dt,spy,t_num)
-    call z_disc(z_num, Depth, GridType, dz, D)
+    call t_disc(TotTime,Timestep,YearType,dt,spy,t_num)            ! Discretization of time -> this function find t_num(number of iteration) and dt(time step)
+    call z_disc(z_num, Depth, GridType, dz, D)                     ! Discretization of space ->this function find D(depth of each layer) and dz(Distance between layer(x) and layer(x+1))
     
     allocate(Kp(1:z_num-1))
     allocate(Temp(1:z_num))
@@ -60,17 +60,33 @@ contains
        allocate(snw_f_t(1:365))
        allocate(T_air(1:365))
        allocate(Soil_temp(1:z_num,1:365))
+       allocate(T_layer23(1:365*20))
+       allocate(T_layer53(1:365*20))
+       allocate(T_layer93(1:365*20))
+       allocate(T_layer143(1:365*20))
+       allocate(T_layer250(1:365*20))
+       allocate(T_layer350(1:365*20))
+       allocate(T_layer550(1:365*20))
+       allocate(T_layer900(1:365*20))
 
     elseif(Forcage_Month_day == 0)then
 
        allocate(T_air(1:12))
        allocate(snw_f_t(1:12))
        allocate(Soil_temp(1:z_num,1:12))
+       allocate(T_layer23(1:12*20))
+       allocate(T_layer53(1:12*20))
+       allocate(T_layer93(1:12*20))
+       allocate(T_layer143(1:12*20))
+       allocate(T_layer250(1:12*20))
+       allocate(T_layer350(1:12*20))
+       allocate(T_layer550(1:12*20))
+       allocate(T_layer900(1:12*20))
     
     end if
     
-    write(*,*) D
-    write(*,*) dz
+    !write(*,*) D
+    !write(*,*) dz
     Day_per_month(1) = 31
     Day_per_month(2) = 28
     Day_per_month(3) = 31
@@ -93,7 +109,7 @@ contains
     snw_tot = 0.0
     swe_tot = 0.0
 
-    !--------- OPENING OF FILE WHICH ARE READ OF WRITTEN ---------!
+    !--------- OPENING OF FILE WHICH ARE READ OR WRITTEN ---------!
 
     if (Bool_layer_temp==1)then
 
@@ -132,7 +148,7 @@ contains
     if (EQ_Tr == 0)then
 
       open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ.txt",status="old",action='read')
-      open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
+      
 
       if(EQ1_EQ2==2 .and. z_num ==51)then
          open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0.txt",status="old",action='read') 
@@ -141,9 +157,11 @@ contains
       end if
       
       if (Forcage_Month_day == 0)then
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_month.txt",status="old",action='read')
+         open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
       else
          open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_day.txt",status="old",action='read')
+         open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
       end if
 
     elseif(EQ_Tr==1)then
@@ -158,12 +176,6 @@ contains
 !----------INITIALISATION----------!   
 
     call Porosity_init(z_num, PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
-     
-    do kk=1,z_num-1
-
-       Kp(kk)=2
-          
-    end do
 
     if (Bool_glacial == 1)then
 
@@ -173,13 +185,13 @@ contains
 
    ! RECOVERY OF FORCING SNOW AND FORCING TEMPERATURE !
 
-    if (EQ_Tr == 0)then
+    if (EQ_Tr == 0)then                              !For an equilibrum run
        
        if (Forcage_Month_day == 0)then                 ! FOR A MONTHLY FORCING
 
           do ll =1,12
 
-             read(unit_nb_2,*) swe_f_t(ll)            ! RECOVERY OF SWE
+             read(unit_nb_2,*) snw_f_t(ll)            ! RECOVERY OF SWE
 
              if (Bool_glacial == 1)then               ! RECOVERY OF AIR TEMPERATURE
                 read(unit_nb_4,*) T_air(ll)
@@ -197,10 +209,16 @@ contains
           end do
 
        end if
+       
+       if (EQ1_EQ2 ==1 ) then                                       ! If there is no initial condition for the ground temperature
 
-       if (EQ1_EQ2 ==1 ) then
+          do kk=1,z_num-1
+
+             Kp(kk)=2
           
-          call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)            ! If there is no initial condition for the ground temperature
+          end do
+          
+          call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)            
 
        elseif(EQ1_EQ2==2)then                                        ! If there is initial condition for the ground temperature
 
@@ -210,7 +228,7 @@ contains
 
        end if
 
-    else
+    else                                             !For a transient run
 
        do ll =1,z_num
 
@@ -223,8 +241,8 @@ contains
        
     end if
 
-    Tb = Temp(z_num)
-    write(*,*) Tb
+    Tb = Temp(z_num)                         ! Lower boundary condition 
+    write(*,*) Temp
 
     do ll = 1,2
        
@@ -265,6 +283,8 @@ contains
 
        end if
 
+       ! ---------- Reading of forcing tamperature and snow/swe forcing --------------- !
+
        if (EQ_Tr == 0)then
           
           if( Forcage_Month_day == 0 .and. Bool_glacial == 0)then
@@ -276,9 +296,17 @@ contains
           end if
 
           if (Bool_Swe_Snw == 0)then
-             swe_f = swe_f_t(ind_days)/(Day_per_month(ind_days))
+             if( Forcage_Month_day == 1)then
+                swe_f = snw_f_t(ind_days)/(Day_per_month(ind_days))
+             else
+                swe_f =  snw_f_t(mod(ll,12)+1)
+             end if
           else
-             snw_f = snw_f_t(mod(ll,365)+1)*2.5
+             if( Forcage_Month_day == 1)then
+                snw_f = snw_f_t(mod(ll,365)+1)
+             else
+                snw_f = snw_f_t(mod(ll,12)+1)
+             end if
           end if
    
        elseif(EQ_Tr==1)then
@@ -307,6 +335,8 @@ contains
        end if
 
        T_old(1:z_num) = Temp(1:z_num)
+
+       ! ----- Parametrisation of snow layers based on fresh/old snow depth --------!
        
        if (snw_tot > 0.000001 .or. swe_f > 0.000001 .or. snw_f>0.00001) then
 
@@ -334,6 +364,8 @@ contains
           end if
        
        end if
+
+       !-------------- Numerical difference routine when there is snow or not --------!
 
        if (snw_tot > 0.0000001) then
 
@@ -365,6 +397,8 @@ contains
           end if
     
        end if
+
+       ! -------- Filing table to show soil temperature ----------!
           
        do kk=1,z_num
           
@@ -391,10 +425,7 @@ contains
           end if
 
        end do
-
-       !write(*,*) Temp
-       
-          
+                 
        if (mod(ll,120000) == 0) then
 
           write(*,*) indice_tab, nb_lines
@@ -412,7 +443,8 @@ contains
           
        end if
        
-
+       !write(*,*) snw_tot
+       
        if (Forcage_month_day == 1 .and. Bool_layer_temp==1) then
 
           if (mod(ll,1000*365) == 0) then
@@ -451,6 +483,7 @@ contains
              T_layer350(240+ll-t_num) = Temp(layer_temp350)
              T_layer550(240+ll-t_num) = Temp(layer_temp550)
              T_layer900(240+ll-t_num) = Temp(layer_temp900)
+             write(snw_d,*) snw_tot
           end if
 
        end if

@@ -3,7 +3,7 @@ module Parametrisation
   
   Implicit none
 
-  integer,parameter :: TotTime = 10000       !temps total en année
+  integer,parameter :: TotTime = 10       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
   integer, parameter :: t_fin=0
   integer,parameter :: YearType = 365        !nombre de jour par an
@@ -14,12 +14,12 @@ module Parametrisation
   integer,parameter :: Bool_Snow = 1          ! forçage en neige ou non (1 ou 0)
   integer,parameter :: Bool_Organic = 1       ! prise en compte de la couche organique ou non (1 ou 0)
   integer, parameter :: EQ_Tr = 0             ! Equilibrum run (0) or Transient run (1) -> using different forcing Temperature and snow
-  integer, parameter :: EQ1_EQ2 = 2           ! EQ1(1) initial temperature calculated with the Geothermal heat flux. EQ2 initial temperature read in a file .txt
+  integer, parameter :: EQ1_EQ2 = 1           ! EQ1(1) initial temperature calculated with the Geothermal heat flux. EQ2 initial temperature read in a file .txt
   integer, parameter :: Bool_delta = 0        ! 
   integer, parameter :: Bool_glacial = 1          ! Using glacial index to modify air temperature
-  integer, parameter :: Bool_layer_temp = 1       ! Creation of .txt with the temperature of the soil at different layer
+  integer, parameter :: Bool_layer_temp = 0       ! Creation of .txt with the temperature of the soil at different layer
   integer, parameter :: Forcage_Month_day = 1     ! (1) Daily or (0) monthly forcing
-  integer, parameter :: Bool_Swe_Snw = 1
+  integer, parameter :: Bool_Swe_Snw = 1          ! (1) Snow forcing, (0) Swe forcing
 
 
   real,parameter :: Depth = 1000.0              !profondeur de la modélisation

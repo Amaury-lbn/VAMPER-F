@@ -43,13 +43,13 @@ program test_fonctions
      t_temp = 0.0
 
   end do
-  write(*,*) "Temp_moy = " , Temp_moy
+  !write(*,*) "Temp_moy = " , Temp_moy
   do kk=1,12
      
   !write(*,*) "Nouveau mois",Soil_temp (:,kk)
      
   end do
   
-  write(*,*) Temp
+  write(*,*) "Température finale =",Temp
 
  end program test_fonctions
