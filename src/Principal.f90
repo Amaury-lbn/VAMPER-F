@@ -2,7 +2,7 @@ module Principal
 
 
   use Parametrisation, only : z_num,TotTime,Timestep,YearType,z_num,Depth,GridType,PorosityType,T_init,Bool_glacial 
-  use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr, EQ1_EQ2, Bool_delta,t_deb,t_fin, alpha
+  use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr, EQ1_EQ2, Bool_delta,t_fin, alpha
   use Parametrisation, only : Bool_layer_temp,Forcage_Month_day,Bool_Swe_Snw,Bool_Model_Snow
   use Fonction_temp, only : AppHeatCapacity, ThermalConductivity
   use Fonction_init, only : Porosity_init, GeoHeatFlow, Glacial_index
@@ -14,6 +14,8 @@ module Principal
   
   integer :: u_n_23,u_n_53,u_n_93,u_n_143,u_n_250,u_n_350,u_n_550,u_n_900,unit_nb_1,unit_nb_2,unit_nb_3,unit_nb_4,unit_nb_5
   integer ::layer_temp23,layer_temp53,layer_temp93,layer_temp143,layer_temp250,layer_temp350,layer_temp550,layer_temp900
+
+# include "constant.h"
 
 
 
@@ -751,11 +753,11 @@ contains
 
 
   subroutine Vamper_step(T_air,swe_f_t,Temp,Tb,Cp,Kp,n,organic_ind,glacial_ind,nb_lines,dim_temp,dim_swe,z_num,dz,dt,t_step, &
-porf,pori,nb_it)
+porf,pori,t_deb)
 
-    integer, intent(inout) ::  organic_ind, nb_lines, dim_swe, dim_temp, t_step
+    integer, intent(inout) ::  organic_ind, nb_lines, dim_swe, dim_temp, t_step,t_deb
     real, intent(in) :: dt, Tb
-    integer, intent(in) :: z_num,nb_it
+    integer, intent(in) :: z_num
 
     real,dimension(z_num),intent(inout) :: dz,n,porf,pori
     real,dimension(z_num),intent(inout) :: Kp,Cp
@@ -816,7 +818,7 @@ porf,pori,nb_it)
 
        if (Bool_glacial==1)then
 
-          indice_tab = nb_lines-floor((-(ll/spy + (nb_it-1)*t_step)+t_deb)/100.0)
+          indice_tab = nb_lines-floor((-(ll/spy)+t_deb)/100.0)
           T_glacial=alpha*(glacial_ind(indice_tab-1)+mod((ll/spy),100.0)*(glacial_ind(indice_tab)-glacial_ind(indice_tab-1))/100.0)
           T_soil = (T_glacial+T_soil)
 
@@ -866,7 +868,9 @@ porf,pori,nb_it)
 
     end do
 
-    write(*,*) indice_tab
+    t_deb = t_deb - t_step
+
+    write(*,*) indice_tab,t_num
 
 
   end subroutine Vamper_step

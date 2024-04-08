@@ -6,7 +6,6 @@ module Parametrisation
   integer,parameter :: TotTime = 10000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
   integer, parameter :: t_fin=0
-  integer, parameter :: t_deb=10000
   integer,parameter :: YearType = 365        !nombre de jour par an
   integer,parameter :: z_num = 101             !nombre de couche étudiée
   integer,parameter :: EXPE = 1                !de 1 à 4, quelle expérience va être réalisée
@@ -68,7 +67,7 @@ module Parametrisation
   integer, parameter :: s_l = 1      ! nombre de couche de neige (marche que avec 1)
 
 
-# define Daily 1 
+
   
 end module Parametrisation
 

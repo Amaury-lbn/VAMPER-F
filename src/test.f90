@@ -19,7 +19,7 @@ program test_fonctions
   real :: T1,T2, t_temp
   real, dimension(:), allocatable ::  snw_totals
   real, dimension(:,:), allocatable :: Soil_temp
-  integer :: unit_number,kk, ll,organic_ind,spy, nb_lines,t_num,dim_temp,dim_swe,t_step
+  integer :: unit_number,kk, ll,organic_ind,spy, nb_lines,t_num,dim_temp,dim_swe,t_step,t_deb
   real, dimension(51) :: Temp_moy
   real,dimension(:),allocatable :: time_gi, glacial_ind
   real :: Tb,dt
@@ -64,7 +64,7 @@ program test_fonctions
 
 
 
-
+  t_deb = 10000
   t_step = 100
 
 
@@ -90,8 +90,9 @@ program test_fonctions
   do kk = 1,99
 
      call Vamper_step(T_air,swe_f_t,Temp,Tb,Cp,Kp,n,organic_ind,glacial_ind,nb_lines,dim_temp,dim_swe,z_num,dz,dt,t_step, &
-porf,pori,kk)
-
+porf,pori,t_deb)
+     
+     write(*,*) t_deb
      write(*,*) Temp
 
   end do
@@ -101,7 +102,7 @@ porf,pori,kk)
   do kk = 1,4
 
      call Vamper_step(T_air,swe_f_t,Temp,Tb,Cp,Kp,n,organic_ind,glacial_ind,nb_lines,dim_temp,dim_swe,z_num,dz,dt,t_step, &
-porf,pori,kk)
+porf,pori,t_deb)
 
      write(*,*) Temp
 
