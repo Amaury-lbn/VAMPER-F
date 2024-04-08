@@ -3,9 +3,10 @@ module Parametrisation
   
   Implicit none
 
-  integer,parameter :: TotTime = 10       !temps total en année
+  integer,parameter :: TotTime = 10000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
   integer, parameter :: t_fin=0
+  integer, parameter :: t_deb=10000
   integer,parameter :: YearType = 365        !nombre de jour par an
   integer,parameter :: z_num = 101             !nombre de couche étudiée
   integer,parameter :: EXPE = 1                !de 1 à 4, quelle expérience va être réalisée
@@ -14,12 +15,13 @@ module Parametrisation
   integer,parameter :: Bool_Snow = 1          ! forçage en neige ou non (1 ou 0)
   integer,parameter :: Bool_Organic = 1       ! prise en compte de la couche organique ou non (1 ou 0)
   integer, parameter :: EQ_Tr = 0             ! Equilibrum run (0) or Transient run (1) -> using different forcing Temperature and snow
-  integer, parameter :: EQ1_EQ2 = 1           ! EQ1(1) initial temperature calculated with the Geothermal heat flux. EQ2 initial temperature read in a file .txt
+  integer, parameter :: EQ1_EQ2 = 2           ! EQ1(1) initial temperature calculated with the Geothermal heat flux. EQ2 initial temperature read in a file .txt
   integer, parameter :: Bool_delta = 0        ! 
   integer, parameter :: Bool_glacial = 1          ! Using glacial index to modify air temperature
-  integer, parameter :: Bool_layer_temp = 0       ! Creation of .txt with the temperature of the soil at different layer
+  integer, parameter :: Bool_layer_temp = 1       ! Creation of .txt with the temperature of the soil at different layer
   integer, parameter :: Forcage_Month_day = 1     ! (1) Daily or (0) monthly forcing
-  integer, parameter :: Bool_Swe_Snw = 1          ! (1) Snow forcing, (0) Swe forcing
+  integer, parameter :: Bool_Swe_Snw = 0          ! (1) Snow forcing, (0) Swe forcing
+  integer, parameter :: Bool_Model_Snow = 1       ! (1) Using snow model to find snow_depth, (0) Forcing with snow_depth
 
 
   real,parameter :: Depth = 1000.0              !profondeur de la modélisation
@@ -40,6 +42,7 @@ module Parametrisation
   real,parameter :: rho_ice = 917.0             ! densité de la glace
   real,parameter :: rho_organic = 1300.0        ! densité de la matière organique
   real,parameter :: rho_soil = 1600.0           ! densité du sol
+  real,parameter :: rho_snow_fresh = 150.0            ! densité de la neige fraiche
 
   !      Capacité thermique massique  (en J/(K*kg))    !
 
@@ -63,6 +66,9 @@ module Parametrisation
   real, parameter :: Latent_heat = 333700.0    ! en J/kg
 
   integer, parameter :: s_l = 1      ! nombre de couche de neige (marche que avec 1)
+
+
+# define Daily 1 
   
 end module Parametrisation
 

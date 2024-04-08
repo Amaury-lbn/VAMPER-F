@@ -29,6 +29,7 @@ module Fonction_temp
        Csoil = (1.0 - n(1)) * rho_soil * C_dry_soil
     end if
     do kk = 1, z_num
+       
        if (kk <= 0) then
           Csoil=((1 - n(kk))* rho_organic * C_organic)
        else
@@ -36,6 +37,7 @@ module Fonction_temp
        end if
        
        if (T(kk) < Tf) then
+          
           a = - (((T(kk) - Tf) / freezing_range) ** 2.0)
           theta = exp(a)
           a = -2.0 / (freezing_range * freezing_range)
@@ -47,6 +49,7 @@ module Fonction_temp
           porf(kk) = n(kk)
           pori(kk) = 0.0
           Cp(kk) = Csoil + (porf(kk) * C_water * rho_water)
+          
           
        end if
 

@@ -15,7 +15,8 @@ module Fonction_implicit
       real, dimension(:), intent(in) :: T_old, n, dz
       real, intent(inout) :: Tsnw
       real, intent(out) :: Cp_snow
-      real, dimension(:), allocatable, intent(out) :: Timp, Cp, Kp
+      real, dimension(z_num), intent(out) :: Timp, Cp
+      real, dimension(z_num), intent(out) :: Kp
     
       ! Variables locales !
 
@@ -33,9 +34,7 @@ module Fonction_implicit
       integer, dimension(z_num+s_l) :: IPIV
       integer :: info_dgesv
 
-      allocate(Timp(1:z_num))
-      allocate(Cp(1:z_num))
-      allocate(Kp(1:z_num))
+
       allocate(porf(1:z_num+s_l))
       allocate(pori(1:z_num+s_l))
       allocate(Cp_s(1:z_num+s_l))
@@ -53,6 +52,7 @@ module Fonction_implicit
       
       Cp_s(1:s_l) = (2.108*1000000.0)*rho_snow/rho_ice
       K_s(1:s_l) = 2.9*(rho_snow**2)*0.000001
+      !write(*,*) K_s(1)
 
       T_last(1:s_l) = Tsnw
       
@@ -74,7 +74,7 @@ module Fonction_implicit
 
          end if
 
-
+         
          call AppHeatCapacity(z_num,T_iter(s_l+1:z_s),T_freeze,n_s(s_l+1:z_s),org_ind+s_l,Cp_temp,porf_temp,pori_temp)
          
 
@@ -83,7 +83,7 @@ module Fonction_implicit
             call ThermalConductivity(ll,n_s(ll),pori_temp(ll-1),porf_temp(ll-1),org_ind+s_l,T_iter(ll),K_s(ll))
             
          end do
-
+         
          Kp_s(1:z_s-1) = (K_s(1:z_s-1)+K_s(2:z_s))*0.5
 
          Knows(1) = Tu
@@ -127,13 +127,15 @@ module Fonction_implicit
          
       end do
 
-
+      
       Timp(1:z_num) = T_iter(s_l+1:z_s)
 
       Cp(1:z_num) = Cp_temp(1:z_num)
+     
       Kp(1:z_num) = K_s(s_l+1:z_s)
       Tsnw = T_iter(1)
       Cp_snow = Cp_s(1)
+      
 
     end subroutine Implicit_snow
 
@@ -143,7 +145,7 @@ module Fonction_implicit
       integer, intent(in) :: org_ind
       real, intent(in) :: dt,Tu,Tb
       real, dimension(:), intent(in) :: T_old, n, dz
-      real, dimension(:), allocatable, intent(out) :: Timp, Kp
+      real, dimension(z_num), intent(out) :: Timp, Kp
       real, dimension(z_num), intent(out) :: Cp
       
       real, dimension(z_num) :: pori, porf, Cp_temp
@@ -160,8 +162,6 @@ module Fonction_implicit
       
       m_Gfx = gfx/1000.0
 
-      allocate(Timp(1:z_num))
-      allocate(Kp(1:z_num))
       T_last(1:z_num) = T_old(1:z_num)
  
       do kk=1,5 

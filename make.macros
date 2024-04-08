@@ -25,7 +25,7 @@ include gfortran.options
 FC                  = ${fc_compiler_path}
 FMAKEDEPEND         = ${fc_fmakedep_path}
 
-FFLAGS              = $(F_OPTIM_HIGH)
+FFLAGS              = $(F_OPTIM_HIGH) $(F_PRE_PROCESS)
 
 INCLUDES            = $(INCLAPACK) $(INCREFBLAS)
 LIBS                = $(LIBLAPACK) $(LIBREFBLAS)

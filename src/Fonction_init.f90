@@ -97,7 +97,7 @@ module Fonction_init
    
     integer, intent(in) :: z_num
     real, intent(in) :: Gfx, T0
-    real, dimension(:), allocatable, intent(in) :: dz, Kp 
+    real, dimension(z_num), intent(in) :: dz, Kp 
     real, dimension(:), allocatable, intent(out) :: T
     integer :: kk
     

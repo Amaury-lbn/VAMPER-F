@@ -29,11 +29,11 @@ contains
 
     
     model_secs = real(TotTime)*60.0*60.0*24.0*yrs2days
-    if (Forcage_Month_Day == 0)then
+#if Daily == 0
        dt = real(Timestep)*60.0*60.0*24.0
-    elseif(Forcage_Month_Day == 1)then
+#else
        dt = 60.0*60.0*24.0
-    end if
+#endif
     t_num = floor(model_secs/dt)
 
 

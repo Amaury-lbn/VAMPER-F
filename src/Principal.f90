@@ -2,31 +2,36 @@ module Principal
 
 
   use Parametrisation, only : z_num,TotTime,Timestep,YearType,z_num,Depth,GridType,PorosityType,T_init,Bool_glacial 
-  use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr, EQ1_EQ2, Bool_delta,t_fin, alpha
-  use Parametrisation, only : Bool_layer_temp,Forcage_Month_day,Bool_Swe_Snw
+  use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr, EQ1_EQ2, Bool_delta,t_deb,t_fin, alpha
+  use Parametrisation, only : Bool_layer_temp,Forcage_Month_day,Bool_Swe_Snw,Bool_Model_Snow
   use Fonction_temp, only : AppHeatCapacity, ThermalConductivity
   use Fonction_init, only : Porosity_init, GeoHeatFlow, Glacial_index
   use Para_fonctions, only : t_disc, z_disc
-  use Model_snow, only : snw_average_swe, snw_proc, snw_average_snw
+  use Model_snow, only : snw_average_swe, snw_proc, snw_average_snw, snw_average_snw_tot
   use Fonction_implicit, only : Implicit_snow, Implicit
-  
+ 
   Implicit none
   
+  integer :: u_n_23,u_n_53,u_n_93,u_n_143,u_n_250,u_n_350,u_n_550,u_n_900,unit_nb_1,unit_nb_2,unit_nb_3,unit_nb_4,unit_nb_5
+  integer ::layer_temp23,layer_temp53,layer_temp93,layer_temp143,layer_temp250,layer_temp350,layer_temp550,layer_temp900
+
+
+
 contains
 
   subroutine Vamper(Temp, Soil_temp, snw_totals)
-    integer :: u_n_23,u_n_53,u_n_93,u_n_143,u_n_250,u_n_350,u_n_550,u_n_900,unit_nb_1,unit_nb_2,unit_nb_3,unit_nb_4,snw_d
-    integer :: t_num, kk, organic_ind, ll, nb_lines,spy, indice_tab,ind_days
-    integer ::layer_temp23,layer_temp53,layer_temp93,layer_temp143,layer_temp250,layer_temp350,layer_temp550,layer_temp900
-    real :: dt, Cp_snow, frac_snw, K_s, rho_snow, snw_tot, swe_f, Tb, snw_dp, swe_tot, Tsnw, T_soil, days,nb_days,snw_old,snw_f
+    
+    integer :: t_num, kk, organic_ind, ll, nb_lines,spy, indice_tab,ind_days,snw_d
+    real :: dt,Cp_snow,frac_snw,K_s,rho_snow,snw_tot,swe_f,Tb,snw_dp,swe_tot,Tsnw,T_soil, days,nb_days,snw_old,snw_f,G0_23,G0_18,itg
 
-    character(len=20) :: ligne
+
     integer, dimension(12) :: Day_per_month
     real, dimension(:),allocatable :: T_layer23,T_layer53,T_layer93,T_layer143,T_layer250,T_layer350,T_layer550,T_layer900
     real, dimension(z_num) :: T_old, Cp, porf, pori, Soil_temp_moy, delta_t_moy
     real, dimension(z_num-1) ::  h_n, h_pori, h_porf
+    real, dimension(365*14) ::  snw_tot_t
 
-    real, dimension(:),allocatable:: T_air, Timp, Kp, n, dz, D, Cp_t, swe_f_t, time_gi,glacial_ind,snw_f_t
+    real, dimension(:),allocatable:: T_air,Timp,Kp,n,dz,D,Cp_t,swe_f_t,time_gi,glacial_ind,snw_f_t
     real, dimension(:,:),allocatable:: delta_T
     real, dimension(:),allocatable,intent(out) :: Temp
     real, dimension(:,:),allocatable,intent(out) :: Soil_temp
@@ -85,7 +90,7 @@ contains
     
     end if
     
-    !write(*,*) D
+    write(*,*) D
     !write(*,*) dz
     Day_per_month(1) = 31
     Day_per_month(2) = 28
@@ -147,7 +152,7 @@ contains
 
     if (EQ_Tr == 0)then
 
-      open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ.txt",status="old",action='read')
+      open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_under_ice.txt",status="old",action='read')
       
 
       if(EQ1_EQ2==2 .and. z_num ==51)then
@@ -157,18 +162,22 @@ contains
       end if
       
       if (Forcage_Month_day == 0)then
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_month.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
          open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
       else
          open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_day.txt",status="old",action='read')
          open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
       end if
 
+      if (Bool_Model_Snow==0)then
+         open(newunit=unit_nb_5,file="/home/users/alambin/VAMPER-F/Donnee/Snow_tot.txt",status="old",action='read')
+      end if
+
     elseif(EQ_Tr==1)then
 
-       open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EQ_100k_3k.txt",status="old",action='read')
-       open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_EXP1.txt",status="old",action='read')
-       open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EXP1.txt",status="old",action='read')
+       open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_1998.txt",status="old",action='read')
+       open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_18y_day.txt",status="old",action='read')
+       open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Swe_18y_day.txt",status="old",action='read')
 
     end if
     
@@ -176,6 +185,7 @@ contains
 !----------INITIALISATION----------!   
 
     call Porosity_init(z_num, PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
+    write(*,*) n
 
     if (Bool_glacial == 1)then
 
@@ -204,7 +214,9 @@ contains
        elseif(Forcage_Month_day == 1)then             ! For a daily forcing 
 
           do ll =1,365
-             read(unit_nb_2,*) snw_f_t(ll)           ! Snow data
+             if (Bool_Model_Snow ==1)then
+                read(unit_nb_2,*) snw_f_t(ll)           ! Snow data
+             end if
              read(unit_nb_4,*) T_air(ll)             ! Air temperature data
           end do
 
@@ -237,8 +249,23 @@ contains
        end do
        
        read(unit_nb_1,*) T_air(1)
-       read(unit_nb_2,*) swe_f
-       
+       if(Bool_Model_Snow==1)then
+          !read(unit_nb_2,*) swe_f
+       end if
+       do kk = 1,365
+
+          read(unit_nb_2,*) snw_f_t(kk)
+
+       end do
+
+    end if
+
+    if (Bool_Model_Snow == 0)then
+
+       do kk=1,365*14
+          read(unit_nb_5,*) snw_tot_t(kk) 
+       end do
+
     end if
 
     Tb = Temp(z_num)                         ! Lower boundary condition 
@@ -289,7 +316,7 @@ contains
           
           if( Forcage_Month_day == 0 .and. Bool_glacial == 0)then
              if (EQ1_EQ2 == 1)then
-                T_soil = (T_air(mod(ll,12)+1)+7.71484184)
+                T_soil = (T_air(mod(ll,12)+1))
              elseif (EQ1_EQ2==2)then
                 T_soil = T_air(mod(ll,12)+1)
              end if
@@ -297,24 +324,31 @@ contains
 
           if (Bool_Swe_Snw == 0)then
              if( Forcage_Month_day == 1)then
-                swe_f = snw_f_t(ind_days)/(Day_per_month(ind_days))
+                swe_f = snw_f_t(mod(ll,365)+1)
              else
                 swe_f =  snw_f_t(mod(ll,12)+1)
              end if
-          else
+          elseif (Bool_Swe_Snw == 1)then
              if( Forcage_Month_day == 1)then
                 snw_f = snw_f_t(mod(ll,365)+1)
              else
                 snw_f = snw_f_t(mod(ll,12)+1)
              end if
           end if
+          
+          if (Bool_Model_Snow == 0)then
+             snw_tot = snw_tot_t(mod(ll,365*14)+1) 
+          end if
    
        elseif(EQ_Tr==1)then
 
           read(unit_nb_1,*) T_air(ll)
-          read(unit_nb_2,*) swe_f
+          !read(unit_nb_2,*) swe_f
+          swe_f = snw_f_t(mod(ll,365)+1)
 
        end if
+
+       !write(*,*) T_air(ll),swe_f,snw_tot
 
        if (Bool_glacial==1)then
 
@@ -322,7 +356,8 @@ contains
 
              indice_tab = nb_lines-floor((-(ll/12.0)+t_fin+TotTime)/100.0)
              T_soil=alpha*(glacial_ind(indice_tab-1)+mod((ll/12.0),100.0)*(glacial_ind(indice_tab)-glacial_ind(indice_tab-1))/100.0)
-             T_soil = T_air(mod(ll,12)+1)+T_soil
+             T_soil = (T_air(mod(ll,12)+1)+T_soil)
+             write(*,*) T_soil
 
           elseif( Forcage_Month_day == 1)then
 
@@ -335,6 +370,7 @@ contains
        end if
 
        T_old(1:z_num) = Temp(1:z_num)
+       
 
        ! ----- Parametrisation of snow layers based on fresh/old snow depth --------!
        
@@ -342,32 +378,43 @@ contains
 
           if (Bool_Swe_Snw == 0)then
              call snw_average_swe(swe_f, swe_tot, snw_tot, rho_snow)
-          else
+          elseif(Bool_Swe_Snw == 1)then
              call snw_average_snw(snw_f, swe_tot, snw_tot, rho_snow,swe_f)
           end if
           
-          if (abs(swe_tot - swe_f )< 0.000001) then
+          if(Bool_Model_snow==0)then
+             call  snw_average_snw_tot(snw_tot,snw_old, rho_snow,swe_tot,dt)
+          end if
+          
+          if (abs(swe_tot - swe_f )< 0.000001 .and. Bool_Model_snow==1) then
 
              if (EQ_Tr == 0)then
-
                 Tsnw = T_soil
-
              else
-                
-                Tsnw = T_air(ll)
-                
+                Tsnw = T_air(ll) 
              end if
-
              K_s = 0.07
              frac_snw = 1
-          
+
+          end if
+
+          if (abs(snw_old)< 0.00001 .and. Bool_Model_snow==0) then
+
+             if (EQ_Tr == 0)then
+                Tsnw = T_soil
+             else
+                Tsnw = T_air(ll) 
+             end if
+             K_s = 0.07
+             frac_snw = 1
+
           end if
        
        end if
 
        !-------------- Numerical difference routine when there is snow or not --------!
 
-       if (snw_tot > 0.0000001) then
+       if (snw_tot > 0.00001) then
 
           if (EQ_Tr == 0)then
 
@@ -380,6 +427,11 @@ contains
           end if
 
           call snw_proc(Tsnw, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+          !if(Tsnw > 0)then
+           !  frac_snw = 0.0
+            ! snw_tot = 0.0
+            ! Tsnw = 0.0
+          !end if
           
        else
 
@@ -439,11 +491,11 @@ contains
              end if
                 
           end do
-          write(*,*) ll
+          write(*,*) ll , Temp
           
        end if
        
-       !write(*,*) snw_tot
+       !write(*,*) snw_tot, Cp_Snow, T_soil, Temp(1), rho_snow
        
        if (Forcage_month_day == 1 .and. Bool_layer_temp==1) then
 
@@ -487,8 +539,22 @@ contains
           end if
 
        end if
+
+       itg=0
+
+       do kk = 1,26
+          itg = itg + Cp(kk)*(Temp(26)-T_old(26))*dz(kk)/dt
+       end do
+       G0_18 = Kp(26)*(Temp(26)-Temp(1))/D(26) + itg
+
+       G0_23 = Kp(layer_temp23)*(Temp(layer_temp23)-Temp(1))/D(layer_temp23)
+       
+       write(*,*) G0_23, G0_18,Cp_snow, T_soil,snw_tot
+
+       
        
     end do
+    write(*,*) D
 
     
     if (Bool_layer_temp==1)then
@@ -504,6 +570,307 @@ contains
     end if
 
   end subroutine Vamper
+
+
+
+
+
+
+
+
+
+
+
+
+
+  subroutine Vamper_init(z_num,dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
+
+    integer, intent(in) :: z_num
+    real, dimension(z_num),intent(in) :: dz,D
+    real, dimension(z_num),intent(out):: Cp
+    real, dimension(z_num-1),intent(out):: Kp
+    real, dimension(:),allocatable,intent(out) :: time_gi,glacial_ind,n,Temp
+    real, intent(out) :: Tb
+    integer, intent(out) :: nb_lines
+    integer, intent(out) :: organic_ind
+
+    real, dimension(z_num-1) ::  h_n, h_pori, h_porf
+    real, dimension(z_num) :: porf,pori
+    integer :: kk,ll
+    
+    
+
+
+    call Porosity_init(z_num, PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
+    !write(*,*) n
+
+    if (Bool_glacial == 1)then
+
+       call Glacial_index(time_gi,glacial_ind,nb_lines)    ! GLACIAL INDEX FOR THE FORCING OF TEMPERATURE
+
+    end if
+                                
+
+    do kk=1,z_num-1
+       
+       Kp(kk)=2
+       
+    end do
+          
+    call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)            
+
+    Tb = Temp(z_num)                         ! Lower boundary condition 
+    
+    !write(*,*) Temp
+
+    do ll = 1,2
+       
+       call AppHeatCapacity(z_num,Temp,T_freeze,n, organic_ind, Cp, porf, pori)         !Calculation of heat capacity of soil
+
+       do kk=1,z_num-1
+          
+          h_pori(kk) = (pori(kk) + pori(kk+1))/2
+          h_porf(kk) = (porf(kk) + porf(kk+1))/2
+          h_n(kk) = (n(kk) + n(kk+1))/2
+          call ThermalConductivity(kk,h_n(kk),h_pori(kk),h_porf(kk), organic_ind, Temp(kk), Kp(kk))    !Calculation of thermal condutivity of soil
+          
+       end do
+       
+    end do
+
+
+  end subroutine Vamper_init
+
+
+
+
+
+
+
+
+
+  subroutine Lecture_forcing(z_num,T_air,swe_f_t,Temp,dim_temp,dim_swe)
+    
+    
+    integer, intent(in) :: z_num
+    real, dimension(z_num),intent(inout) :: Temp
+    integer, intent(out) :: dim_temp,dim_swe
+    real, dimension(:), allocatable, intent(out):: T_air, swe_f_t
+    integer :: kk,ii,ll
+    real :: ligne
+
+    ll = 0
+    dim_swe = 0
+    dim_temp = 0
+
+    if (EQ_Tr == 0)then
+
+
+      if(EQ1_EQ2==2 .and. z_num ==51)then
+         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0.txt",status="old",action='read') 
+      else
+         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
+      end if
+
+      
+# if Daily == 0
+         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
+         open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
+# else
+         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_day.txt",status="old",action='read')
+         open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
+# endif
+
+
+    elseif(EQ_Tr==1)then
+
+       open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_1998.txt",status="old",action='read')
+       open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_18y_day.txt",status="old",action='read')
+       open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Swe_18y_day.txt",status="old",action='read')
+
+    end if
+    
+    if(EQ1_EQ2==2)then
+       
+       do kk=1,z_num 
+          read(unit_nb_3,*) Temp(kk)
+       end do
+
+       close(unit_nb_3)
+
+    end if
+
+    
+    do
+
+       read(unit_nb_2,*,iostat=ii) ligne
+
+       if(ii/=0)exit
+
+       dim_swe = dim_swe + 1
+
+    end do
+    
+    allocate(swe_f_t(1:dim_swe))
+    rewind(unit_nb_2)
+    
+    do kk = 1,dim_swe
+       
+       read(unit_nb_2,*) swe_f_t(kk)
+
+    end do
+
+
+    do
+
+       read(unit_nb_1,*,iostat=ii) ligne
+
+       if(ii/=0)exit
+
+       dim_temp = dim_temp + 1
+
+    end do
+
+    allocate(T_air(1:dim_temp))    
+    rewind(unit_nb_1)
+
+    do kk = 1,dim_temp
+       
+       read(unit_nb_1,*) T_air(kk)
+
+    end do
+
+    
+
+    close(unit_nb_1)    
+    close(unit_nb_2)
+    
+
+  end subroutine Lecture_forcing
+
+
+
+  subroutine Vamper_step(T_air,swe_f_t,Temp,Tb,Cp,Kp,n,organic_ind,glacial_ind,nb_lines,dim_temp,dim_swe,z_num,dz,dt,t_step, &
+porf,pori,nb_it)
+
+    integer, intent(inout) ::  organic_ind, nb_lines, dim_swe, dim_temp, t_step
+    real, intent(in) :: dt, Tb
+    integer, intent(in) :: z_num,nb_it
+
+    real,dimension(z_num),intent(inout) :: dz,n,porf,pori
+    real,dimension(z_num),intent(inout) :: Kp,Cp
+    real,dimension(dim_swe),intent(in) :: swe_f_t
+    real,dimension(dim_temp),intent(in) :: T_air
+    real,dimension(nb_lines),intent(in) :: glacial_ind
+    real, dimension(z_num),intent(inout) :: Temp
+
+    integer :: kk, ll, indice_tab, ind_days, snw_d,t_num
+    real :: snw_f, T_soil, T_glacial, Tsnw, swe_tot,snw_tot,rho_snow,swe_f,frac_snw,k_s,Cp_snow,spy
+    real, dimension(z_num-1) ::  h_n, h_pori, h_porf
+    real, dimension(z_num) :: T_old
+    real, dimension(:),allocatable :: Cp_t
+
+    
+    swe_tot = 0
+    snw_tot = 0
+
+    
+
+    do ll = 1,2
+       
+       call AppHeatCapacity(z_num,Temp,T_freeze,n, organic_ind, Cp, porf, pori)         !Calculation of heat capacity of soil
+       
+       do kk=1,z_num-1
+          
+          h_pori(kk) = (pori(kk) + pori(kk+1))/2
+          h_porf(kk) = (porf(kk) + porf(kk+1))/2
+          h_n(kk) = (n(kk) + n(kk+1))/2
+          
+          call ThermalConductivity(kk,h_n(kk),h_pori(kk),h_porf(kk), organic_ind, Temp(kk), Kp(kk))    !Calculation of thermal condutivity of soil
+          
+       end do
+       
+    end do
+
+# if Daily == 0
+
+       spy = 12
+       t_num = t_step*12
+
+#else 
+
+       spy = 365
+       t_num = t_step * 365
+
+#endif
+
+    
+
+    do ll=1,t_num
+
+       !write(*,*) "ok"
+
+
+       T_soil = T_air(mod(ll,dim_temp)+1)
+       swe_f  = swe_f_t(mod(ll,dim_swe)+1)
+
+       if (Bool_glacial==1)then
+
+          indice_tab = nb_lines-floor((-(ll/spy + (nb_it-1)*t_step)+t_deb)/100.0)
+          T_glacial=alpha*(glacial_ind(indice_tab-1)+mod((ll/spy),100.0)*(glacial_ind(indice_tab)-glacial_ind(indice_tab-1))/100.0)
+          T_soil = (T_glacial+T_soil)
+
+       end if
+
+       if (snw_tot > 0.000001 .or. swe_f > 0.000001) then
+
+
+          call snw_average_swe(swe_f, swe_tot, snw_tot, rho_snow)
+
+          
+          if (abs(swe_tot - swe_f )< 0.000001) then
+
+             if (EQ_Tr == 0)then
+                Tsnw = T_soil
+             else
+                Tsnw = T_air(ll) 
+             end if
+             K_s = 0.07
+             frac_snw = 1
+
+          end if
+       
+       end if
+
+       T_old(1:z_num) = Temp(1:z_num)
+
+       !-------------- Numerical difference routine when there is snow or not --------!
+
+       if (snw_tot > 0.00001) then
+
+
+          call Implicit_snow(snw_tot,rho_snow,Tsnw,T_old,T_soil,dt,dz,n,organic_ind,Temp,Cp,Kp,Cp_snow)
+
+          call snw_proc(Tsnw, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+          
+       else
+
+          swe_tot = 0.0
+          snw_tot = 0.0
+          
+          call Implicit(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+          
+
+       end if
+
+
+    end do
+
+    write(*,*) indice_tab
+
+
+  end subroutine Vamper_step
+
   
   
 end module Principal
