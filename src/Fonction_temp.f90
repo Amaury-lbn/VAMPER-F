@@ -2,8 +2,8 @@
 
 module Fonction_temp
 
-  use Parametrisation, only : C_ice,C_dry_soil,C_organic,C_water,freezing_range,Latent_Heat,rho_ice,z_num
-  use Parametrisation, only :rho_organic,rho_soil,rho_water,K_other_minerals,K_organic,K_quartz,q_quartz
+  use Parametrisation, only : C_ice,C_dry_soil,C_organic,C_water,freezing_range,Latent_Heat,rho_ice,z_num,K_fluids
+  use Parametrisation, only :rho_organic,rho_soil,rho_water,K_other_minerals,K_organic,K_quartz,q_quartz,Bool_geometric,K_ice
 
   Implicit none
 
@@ -80,9 +80,42 @@ module Fonction_temp
 
     Kice = 0.4865 + 488.19/(273.15 +Temp)
 
-    Ther_cond = 0.5 * (Ksoil**(1-h_n) * Kice**(h_pori) * Kfluids**(h_porf))
+    if (Bool_geometric == 1) then
+
+       Ther_cond = (Ksoil**(1-h_n) * Kice**(h_pori) * Kfluids**(h_porf))
+
+    else
+       
+       Ther_cond = ((Ksoil**0.5)*(1-h_n) + (K_ice**0.5)*(h_pori) + (K_fluids**0.5)*(h_porf))**2
+
+    end if
 
   end subroutine ThermalConductivity
+
+
+  subroutine Permafrost_Depth(Temp,D,Per_depth)
+     real, dimension(z_num), intent(in) :: Temp,D
+     real, intent(out) :: Per_depth
+     integer :: kk, z_m, z_p
+     real :: alpha
+
+     do kk=0,z_num-1
+        
+        if (Temp(z_num-kk)<0) then
+           
+           z_m=z_num-kk
+           z_p=z_num-kk+1
+           exit
+        
+        end if
+     
+     end do
+
+     alpha = Temp(z_p)-Temp(z_m)
+
+     Per_depth = D(z_p) - Temp(z_p)/alpha
+     
+  end subroutine Permafrost_Depth
 
   
 end module Fonction_temp

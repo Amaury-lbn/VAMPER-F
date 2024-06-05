@@ -83,9 +83,9 @@ module Model_snow
 
 
 
-    subroutine snw_proc(Tsnw, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+    subroutine snw_proc(Tsnw,T_soil, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
 
-      real, intent(inout) :: Tsnw, snw_tot, swe_tot, frac_snw, rho_snow
+      real, intent(inout) :: Tsnw,T_soil, snw_tot, swe_tot, frac_snw, rho_snow
       real, intent(in) :: Cp_snow, dt
       real :: frac_snw_old, rho_snow_old, swe_melt, H_1, H_2, N, var, rho_snow_new
 
@@ -93,19 +93,19 @@ module Model_snow
       frac_snw_old = frac_snw
       rho_snow_old = rho_snow
 
-      if ( Tsnw >= 0 ) then
+      if ( Tsnw >= 0.0 ) then
          
-         H_1 = (Tsnw + 273.15)*Cp_snow*snw_tot
+         H_1 = (Tsnw)*Cp_snow*snw_tot
          H_2 = rho_water * Latent_heat * swe_tot
          !write(*,*) H_1-H_2
          if (H_1<=H_2) then
             
             frac_snw = 1-(H_1/H_2)
             !write(*,*) snw_tot
-            snw_tot = frac_snw * snw_tot/frac_snw_old
-            !write(*,*) frac_snw, Tsnw, snw_tot
+            snw_tot = frac_snw * snw_tot
+            write(*,*) frac_snw, Tsnw, snw_tot
             Tsnw = 0.0
-            write(*,*) "H1<H2"
+            !write(*,*) "H1<H2"
          else
             
             frac_snw = 0.0

@@ -82,7 +82,7 @@ module Fonction_init
        
        do pas_z = organic_ind, z_num
           
-          n(pas_z) = Porosity_soil*exp(0.000395*Depth_layer(pas_z))
+          n(pas_z) = Porosity_soil*exp(-0.000395*Depth_layer(pas_z))
 
        end do
 
