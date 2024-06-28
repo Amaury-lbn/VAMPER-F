@@ -1,7 +1,9 @@
 module Parametrisation
 
   
-  Implicit none
+  implicit none
+  
+  public !dmr here can be fully public, these are only parameter constants
 
   integer,parameter :: TotTime = 400000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 

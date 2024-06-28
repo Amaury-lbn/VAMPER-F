@@ -2,26 +2,25 @@
 
 program test_fonctions
 
-  use Principal, only : Vamper_init,Lecture_forcing, Vamper_step
 
 !~   use Fonction_init, only: !dmr unused                                                                              [TBRMD]
-
 !~   use Parametrisation, only : z_num,TotTime,Timestep,YearType,z_num,Depth,GridType,PorosityType,T_init,Bool_glacial [TBRMD] 
 !~   use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr, EQ1_EQ2, Bool_delta,t_fin, alpha     [TBRMD]
 !~   use Parametrisation, only : Bool_layer_temp,Forcage_Month_day,Bool_Swe_Snw,Bool_Model_Snow                        [TBRMD]
-
+!~   use Fonction_implicit, only : Implicit_snow, Implicit                                                             [TBRMD]
 
   use Parametrisation, only: z_num
 
   !dmr [2024-06-28] Functions used in the main
-
+  use Principal, only : Vamper_init,Lecture_forcing, Vamper_step
+  
   use Fonction_temp, only : AppHeatCapacity, ThermalConductivity
   use Fonction_init, only : Porosity_init, GeoHeatFlow, Glacial_index
-
+  
+  
   use Para_fonctions, only : t_disc, z_disc
 
   use Model_snow, only : snw_average_swe, snw_proc, snw_average_snw, snw_average_snw_tot
-!~   use Fonction_implicit, only : Implicit_snow, Implicit                                                              [TBRMD]
 
   implicit none
   

@@ -8,17 +8,19 @@ module Principal
   use Fonction_init, only : Porosity_init, GeoHeatFlow, Glacial_index
   use Para_fonctions, only : t_disc, z_disc
   use Model_snow, only : snw_average_swe, snw_proc, snw_average_snw, snw_average_snw_tot
-  use Fonction_implicit, only : Implicit_snow, Implicit
+  use Fonction_implicit, only : Implicit_snow, Implicit_T
  
   Implicit none
+  
+  private !dmr making sure local variables are local, hence private
+  
+  public :: Vamper_init, Lecture_forcing, Vamper_step
   
   integer :: u_n_23,u_n_53,u_n_93,u_n_143,u_n_250,u_n_350,u_n_550,u_n_900
   integer :: layer_temp23,layer_temp53,layer_temp93,layer_temp143,layer_temp250,layer_temp350,layer_temp550,layer_temp900
   integer :: unit_nb_1,unit_nb_2,unit_nb_3,unit_nb_4,unit_nb_5,unit_nb_6
 
 # include "constant.h"
-
-
 
 contains
 
@@ -454,11 +456,11 @@ contains
           
           if (EQ_Tr == 0)then
 
-             call Implicit(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp_t,Kp) 
+             call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp_t,Kp) 
           
           else
 
-             call Implicit(T_old,T_air(ll),Tb,dt,dz,n,organic_ind,Temp,Cp_t,Kp)
+             call Implicit_T(T_old,T_air(ll),Tb,dt,dz,n,organic_ind,Temp,Cp_t,Kp)
 
           end if
     
@@ -1019,7 +1021,7 @@ glacial_ind(indice_tab-1))/100.0)
 
           !T_soil = T_snw_t(mod(ll,dim_temp)+1)
 
-          call Implicit(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
 
           if (Bool_Bessi==0) then
              call snw_proc(Tsnw(1),Temp(1), snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
@@ -1038,7 +1040,7 @@ glacial_ind(indice_tab-1))/100.0)
 
           !T_soil = T_snw_t(mod(ll,dim_temp)+1)
 
-          call Implicit(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
           
 
        end if

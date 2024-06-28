@@ -4,7 +4,10 @@ module Fonction_implicit
   use Parametrisation, only : z_num, rho_ice, Gfx, T_freeze,rho_snow_freeze,s_l_max
   use Fonction_temp, only : AppHeatCapacity, ThermalConductivity
 
-  Implicit none
+  implicit none
+
+  private
+  public :: Implicit_T, Implicit_snow
 
   contains
 

@@ -4,8 +4,12 @@ module Model_snow
 
   use Parametrisation, only : Latent_heat, rho_water, rho_snow_freeze, gravity, rho_snow_fresh
 
-  Implicit none
+  implicit none
 
+  private
+  
+  public :: snw_average_swe, snw_average_snw, snw_average_snw_tot, snw_proc
+  
   contains
 
     

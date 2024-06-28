@@ -2,12 +2,14 @@ module Para_fonctions
 
 use Parametrisation, only : Forcage_Month_Day
 
-Implicit none
+implicit none
 
 # include "constant.h"
 
-contains
+private
+public :: indice_minimum, t_disc, z_disc
 
+contains
 
 
 
@@ -173,5 +175,6 @@ contains
 
 
   end subroutine indice_minimum
+
 end module Para_fonctions
     

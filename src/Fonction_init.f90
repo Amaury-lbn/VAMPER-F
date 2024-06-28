@@ -5,8 +5,10 @@ module Fonction_init
   use Parametrisation, only : n_organic, Porosity_soil
   use Para_fonctions, only: indice_minimum
 
-  Implicit none
+  implicit none
 
+  private
+  public :: Porosity_init, GeoHeatFlow, Glacial_index
 
   contains
 
