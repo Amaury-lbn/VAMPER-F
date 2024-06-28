@@ -22,6 +22,9 @@ module Principal
 
 contains
 
+#define OLD_VAMP 0
+
+#if ( OLD_VAMP == 1 )
   subroutine Vamper(Temp, Soil_temp, snw_totals)
     
     integer :: t_num, kk, organic_ind, ll, nb_lines,spy, indice_tab,ind_days,snw_d,s_l_t
@@ -581,18 +584,7 @@ contains
     end if
 
   end subroutine Vamper
-
-
-
-
-
-
-
-
-
-
-
-
+#endif
 
   subroutine Vamper_init(z_num,dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
 

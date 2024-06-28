@@ -13,11 +13,13 @@ contains
 
   !sous routine trouvant les parametre permettant la discrétisation en temps!   ! a changer plus tard !
 
-  subroutine t_disc(TotTime,Timestep,YearType,dt,spy,t_num)   !fonctionnelle!
+  subroutine t_disc(dt,spy,t_num)   !fonctionnelle!
+
+    use Parametrisation, only: TotTime,Timestep,YearType
     
     Implicit none
 
-    integer,intent(in) ::  TotTime,Timestep,YearType
+!~     integer,intent(in) ::  TotTime,Timestep,YearType
     integer,intent(out) :: t_num, spy
     real, intent(out) :: dt
     real :: yrs2days
@@ -55,12 +57,14 @@ contains
 
 !sous routine trouvant les parametre permettant la discrétisation selon z (la profondeur)!
 
-  subroutine z_disc(z_num, Depth, GridType, dz, D)     !fonctionnelle!
+  subroutine z_disc(dz, D)     !fonctionnelle!
+
+    use Parametrisation, only: z_num, Depth, GridType
     
     Implicit none 
 
-    real, intent(in) :: Depth
-    integer, intent(in) :: Gridtype, z_num
+!~     real, intent(in) :: Depth
+!~     integer, intent(in) :: Gridtype, z_num
     real, dimension(:), allocatable, intent(out) :: dz,D
     real, dimension(:), allocatable :: D_temp
     integer :: kk

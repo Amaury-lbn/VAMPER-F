@@ -4,12 +4,14 @@ program test_fonctions
 
   use Principal, only : Vamper_init,Lecture_forcing, Vamper_step
 
-!~   use Fonction_init, only: !dmr unused                                                                             [TBRMD]
+!~   use Fonction_init, only: !dmr unused                                                                              [TBRMD]
 
-  use Parametrisation, only : z_num,TotTime,Timestep,YearType,z_num,Depth,GridType,PorosityType,T_init,Bool_glacial 
-!~   use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr, EQ1_EQ2, Bool_delta,t_fin, alpha    [TBRMD]
-!~   use Parametrisation, only : Bool_layer_temp,Forcage_Month_day,Bool_Swe_Snw,Bool_Model_Snow                       [TBRMD]
+!~   use Parametrisation, only : z_num,TotTime,Timestep,YearType,z_num,Depth,GridType,PorosityType,T_init,Bool_glacial [TBRMD] 
+!~   use Parametrisation, only : Bool_Organic,organic_depth,Gfx, T_freeze, EQ_Tr, EQ1_EQ2, Bool_delta,t_fin, alpha     [TBRMD]
+!~   use Parametrisation, only : Bool_layer_temp,Forcage_Month_day,Bool_Swe_Snw,Bool_Model_Snow                        [TBRMD]
 
+
+  use Parametrisation, only: z_num
 
   !dmr [2024-06-28] Functions used in the main
 
@@ -22,6 +24,7 @@ program test_fonctions
   use Fonction_implicit, only : Implicit_snow, Implicit
 
   implicit none
+  
   integer :: kk, ll,organic_ind,spy, nb_lines,t_num,dim_temp,dim_swe,t_step,t_deb
   real,dimension(:),allocatable :: time_gi, glacial_ind
   real :: Tb,dt
@@ -37,28 +40,38 @@ program test_fonctions
 
   !dmr Inputs to t_disc:
   !dmr
+  !dmr intent(out)               t_num     the number of timesteps to perform from:     t_num = floor(model_secs/dt)
+  !dmr intent(out)               spy       probably the number of steps per year from above
+  !dmr intent(out)               dt        dt is the delta time step of the model, in seconds
+
+  call t_disc(dt,spy,t_num)
+
+!dmr [2024-06-28] Removed dependency to internal constants here. These intent(in) are parameters
   !dmr intent(in)                TotTime  defines the number of years (to run I presume)
   !dmr intent(in)                Timestep contains 1, 15 or 30 (from branching values)
   !dmr                                    30 seems to define monthly => spy = 12 and dt = real(Timestep)*60.0*60.0*24.0 in seconds
   !dmr                                    15 defines? [NOTA UNCLEAR] / spy = 24 that is two steps per months ???
   !dmr                                     1 defines a form of daily, with spy = 360 and dt as above. Why is there a Daily switch? [NOTA UNCLEAR] 
   !dmr intent(in)                YearType defines the number of days in years, 360 or 365
-  !dmr intent(out)               t_num     the number of timesteps to perform from:     t_num = floor(model_secs/dt)
-  !dmr intent(out)               spy       probably the number of steps per year from above
-  !dmr intent(out)               dt        dt is the delta time step of the model, in seconds
+!~   call t_disc(TotTime,Timestep,YearType,dt,spy,t_num)
+!dmr [2024-06-28] [TBRMD]
 
-  call t_disc(TotTime,Timestep,YearType,dt,spy,t_num)            
 
   !dmr Inputs to z_disc:
   !dmr 
-  !dmr intent(in)                Depth maximum depth, in meters, from the parametrisation file, now 1000 meters
-  !dmr intent(in)                Gridtype if 2 : linspace else: logspace 
-  !dmr intent(in)                z_num number of vertical layers, 51 or (now) 101
   !dmr intent(out) (allocatable) dz thickness of the layer considered 
   !dmr intent(out) (allocatable) D = depth of the layer considered
- 
-  call z_disc(z_num, Depth, GridType, dz, D)
+
+  call z_disc(dz, D)
   
+!dmr [2024-06-28] Removed dependency to internal constants here. These intent(in) are parameters
+
+  !dmr intent(in)                Depth maximum depth, in meters, from the parametrisation file, now 1000 meters
+  !dmr intent(in)                Gridtype if 2 : linspace else: logspace 
+  !dmr intent(in)                z_num number of vertical layers, 51 or (now) 101 
+!~   call z_disc(z_num, Depth, GridType, dz, D)
+!dmr [2024-06-28] [TBRMD]
+
   write(*,*) "[MAIN] spy: ", spy
 
   allocate(Kp(1:z_num-1))
