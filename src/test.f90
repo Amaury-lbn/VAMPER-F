@@ -21,7 +21,7 @@ program test_fonctions
   use Para_fonctions, only : t_disc, z_disc
 
   use Model_snow, only : snw_average_swe, snw_proc, snw_average_snw, snw_average_snw_tot
-  use Fonction_implicit, only : Implicit_snow, Implicit
+!~   use Fonction_implicit, only : Implicit_snow, Implicit                                                              [TBRMD]
 
   implicit none
   

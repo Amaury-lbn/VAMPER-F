@@ -67,8 +67,8 @@ module Parametrisation
 
   integer, parameter :: s_l_max = 2      ! nombre de couche de neige (marche que avec 1)
 
-
-
+  !dmr spatialisation
+  integer, parameter :: nb_points = 100 !dmr start with a 10x10 square
   
 end module Parametrisation
 

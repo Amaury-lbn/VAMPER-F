@@ -178,7 +178,7 @@ module Fonction_implicit
     end subroutine Implicit_snow
 
 
-    subroutine Implicit(T_old,Tu,Tb,dt,dz,n,org_ind,Timp,Cp,Kp)
+    subroutine Implicit_T(T_old,Tu,Tb,dt,dz,n,org_ind,Timp,Cp,Kp)
       
       integer, intent(in) :: org_ind
       real, intent(in) :: dt,Tu,Tb
@@ -291,7 +291,7 @@ module Fonction_implicit
       Timp(1:z_num) = T_iter(1:z_num)
       !write(*,*) dz(z_num),dz(z_num-1)
 
-    end subroutine Implicit
+    end subroutine Implicit_T
 
 
 end module Fonction_implicit
