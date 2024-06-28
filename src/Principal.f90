@@ -95,7 +95,7 @@ contains
     
     end if
     
-    write(*,*) D
+    write(*,*) "[PRINC] 1|D: ", D
     !write(*,*) dz
     Day_per_month(1) = 31
     Day_per_month(2) = 28
@@ -190,7 +190,7 @@ contains
 !----------INITIALISATION----------!   
 
     call Porosity_init(z_num, PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
-    write(*,*) n
+    write(*,*) "[PRINC] n:",  n
 
     if (Bool_glacial == 1)then
 
@@ -280,7 +280,7 @@ contains
     end if
 
     Tb = Temp(z_num)                         ! Lower boundary condition 
-    write(*,*) Temp
+    write(*,*) "[PRINC] Temp: ",  Temp
 
     do ll = 1,2
        
@@ -368,7 +368,7 @@ contains
              indice_tab = nb_lines-floor((-(ll/12.0)+t_fin+TotTime)/100.0)
              T_soil=alpha*(glacial_ind(indice_tab-1)+mod((ll/12.0),100.0)*(glacial_ind(indice_tab)-glacial_ind(indice_tab-1))/100.0)
              T_soil = (T_air(mod(ll,12)+1)+T_soil)
-             write(*,*) T_soil
+             write(*,*) "[PRINC] T_soil: ", T_soil
 
           elseif( Forcage_Month_day == 1)then
 
@@ -491,7 +491,7 @@ contains
                  
        if (mod(ll,120000) == 0) then
 
-          write(*,*) indice_tab, nb_lines
+          write(*,*) "[PRINC] indice_tab, nb_lines: ", indice_tab, nb_lines
 
           do kk=1,z_num
              
@@ -502,7 +502,7 @@ contains
              end if
                 
           end do
-          write(*,*) ll , Temp
+          write(*,*) "[PRINC] ll, Temp: ", ll , Temp
           
        end if
        
@@ -517,8 +517,8 @@ contains
                 Soil_temp_moy(kk) = sum(Soil_temp(kk,1:365))/365.0
                 
              end do
-             write(*,*) ll
-             write(*,*) "Soil_temp_moy =" , Soil_temp_moy
+             write(*,*) "[PRINC] ll: ", ll
+             write(*,*) "[PRINC] Soil_temp_moy: " , Soil_temp_moy
              !write(*,*) "delta_t_moy =" , delta_t_moy 
 
           end if
@@ -560,12 +560,12 @@ contains
 
        G0_23 = Kp(layer_temp23)*(Temp(layer_temp23)-Temp(1))/D(layer_temp23)
        
-       write(*,*) G0_23, G0_18,Cp_snow, T_soil,snw_tot
+       write(*,*) "[PRINC] G0_23, G0_18,Cp_snow, T_soil,snw_tot: ", G0_23, G0_18,Cp_snow, T_soil,snw_tot
 
        
        
     end do
-    write(*,*) D
+    write(*,*) "[PRINC] 2|D: ", D
 
     
     if (Bool_layer_temp==1)then
@@ -906,7 +906,7 @@ status="replace",action='write')
     snw_old = 0
     ind_snw = 0
     s_l_t = 1
-    write(*,*) organic_ind
+    write(*,*) "[PRINC] organic_ind: ", organic_ind
     
     do kk =1,s_l_max
 
@@ -1072,7 +1072,7 @@ glacial_ind(indice_tab-1))/100.0)
        end if
 
        call Permafrost_Depth(Temp,D,Per_depth)
-       write(*,*) Per_depth
+       write(*,*) "[PRINC] Per_depth: ", Per_depth
        
        !write(*,*) Kp
 
@@ -1080,9 +1080,10 @@ glacial_ind(indice_tab-1))/100.0)
 
     t_deb = t_deb - floor(t_step/365.0)
 
-    write(*,*) indice_tab,t_num,organic_ind
+    if (Bool_glacial.eq.1) then !dmr indice_tab is undefined if Bool_glacial is not 1
+      write(*,*) "[PRINC] indice_tab,t_num,organic_ind: ", indice_tab,t_num,organic_ind
     !write(u_n_23,*) Kp
-
+    endif
    
     if (Bool_layer_temp==1)then
        write(u_n_23,*) T_layer23

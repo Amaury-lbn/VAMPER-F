@@ -103,7 +103,7 @@ module Model_snow
             frac_snw = 1-(H_1/H_2)
             !write(*,*) snw_tot
             snw_tot = frac_snw * snw_tot
-            write(*,*) frac_snw, Tsnw, snw_tot
+            write(*,*) "[MOD_SNW] frac_snw, Tsnw, snw_tot: ", frac_snw, Tsnw, snw_tot
             Tsnw = 0.0
             !write(*,*) "H1<H2"
          else

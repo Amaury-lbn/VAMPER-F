@@ -72,7 +72,7 @@ module Fonction_implicit
          T_last(kk) = Tsnw(kk)
       end do
       
-      write(*,*) K_s(1), Cp_s(1)
+      write(*,*) "[FONC_IMP] K_s, Cp_s: ", K_s(1), Cp_s(1)
       
       !write(*,*)"T_last=", T_last
      

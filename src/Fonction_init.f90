@@ -127,7 +127,7 @@ module Fonction_init
     
     read(unit_number4,*) char, nb_lines
 
-    write(*,*) nb_lines
+    write(*,*) "[FONC_INIT] nb_lines: ", nb_lines
     
     allocate(time_gi(1:nb_lines))
     allocate(glacial_ind(1:nb_lines))
