@@ -3,7 +3,7 @@
 module Fonction_init
 
   use Parametrisation, only : n_organic, Porosity_soil
-  use Para_fonctions
+  use Para_fonctions, only: indice_minimum
 
   Implicit none
 
@@ -120,10 +120,10 @@ module Fonction_init
     integer,intent(out) :: nb_lines
     integer :: unit_number4,ll
     real :: time_temp, niveau_eau,glacial_ind_temp,kk
-    character(len=8) :: char
+    character(len=8) :: char ! [NOTA : BAD NAME] (char is a reserved word in FORTRAN)
 
 
-    open(newunit=unit_number4,file="/home/users/alambin/VAMPER-F/Donnee/Glacial_index.txt",status="old",action='read') 
+    open(newunit=unit_number4,file="Donnee/Glacial_index.txt",status="old",action='read') 
     
     read(unit_number4,*) char, nb_lines
 

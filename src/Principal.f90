@@ -144,45 +144,45 @@ contains
           layer_temp900 = 60
 
        end if
-       open(newunit=u_n_23,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_23.txt",status="replace",action='write')
-       open(newunit=u_n_53,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_53.txt",status="replace",action='write')
-       open(newunit=u_n_93,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_93.txt",status="replace",action='write')
-       open(newunit=u_n_143,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_143.txt",status="replace",action='write')
-       open(newunit=u_n_250,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_250.txt",status="replace",action='write')
-       open(newunit=u_n_350,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_350.txt",status="replace",action='write')
-       open(newunit=u_n_550,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_550.txt",status="replace",action='write')
-       open(newunit=u_n_900,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_900.txt",status="replace",action='write') 
-       open(newunit=snw_d,file="/home/users/alambin/VAMPER-F/Resultats/Snw_depth.txt",status="replace",action='write') 
+       open(newunit=u_n_23,file="Resultats/Temp_layer_23.txt",status="replace",action='write')
+       open(newunit=u_n_53,file="Resultats/Temp_layer_53.txt",status="replace",action='write')
+       open(newunit=u_n_93,file="Resultats/Temp_layer_93.txt",status="replace",action='write')
+       open(newunit=u_n_143,file="Resultats/Temp_layer_143.txt",status="replace",action='write')
+       open(newunit=u_n_250,file="Resultats/Temp_layer_250.txt",status="replace",action='write')
+       open(newunit=u_n_350,file="Resultats/Temp_layer_350.txt",status="replace",action='write')
+       open(newunit=u_n_550,file="Resultats/Temp_layer_550.txt",status="replace",action='write')
+       open(newunit=u_n_900,file="Resultats/Temp_layer_900.txt",status="replace",action='write') 
+       open(newunit=snw_d,file="Resultats/Snw_depth.txt",status="replace",action='write') 
     end if
 
     if (EQ_Tr == 0)then
 
-      open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_under_ice.txt",status="old",action='read')
+      open(newunit=unit_nb_1,file="Donnee/Temp_under_ice.txt",status="old",action='read')
       
 
       if(EQ1_EQ2==2 .and. z_num ==51)then
-         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0.txt",status="old",action='read') 
+         open(newunit=unit_nb_3,file="Donnee/Temp_soil_0.txt",status="old",action='read') 
       else
-         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
+         open(newunit=unit_nb_3,file="Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
       end if
       
       if (Forcage_Month_day == 0)then
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
-         open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="Donnee/Snow_EQ.txt",status="old",action='read')
+         open(newunit=unit_nb_4,file="Donnee/Temp_Bayevla.txt",status="old",action='read')
       else
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_day.txt",status="old",action='read')
-         open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="Donnee/Snow_fresh_day.txt",status="old",action='read')
+         open(newunit=unit_nb_4,file="Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
       end if
 
       if (Bool_Model_Snow==0)then
-         open(newunit=unit_nb_5,file="/home/users/alambin/VAMPER-F/Donnee/Snow_tot.txt",status="old",action='read')
+         open(newunit=unit_nb_5,file="Donnee/Snow_tot.txt",status="old",action='read')
       end if
 
     elseif(EQ_Tr==1)then
 
-       open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_1998.txt",status="old",action='read')
-       open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_18y_day.txt",status="old",action='read')
-       open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Swe_18y_day.txt",status="old",action='read')
+       open(newunit=unit_nb_3,file="Donnee/Temp_soil_1998.txt",status="old",action='read')
+       open(newunit=unit_nb_1,file="Donnee/Temp_18y_day.txt",status="old",action='read')
+       open(newunit=unit_nb_2,file="Donnee/Swe_18y_day.txt",status="old",action='read')
 
     end if
     
@@ -649,7 +649,7 @@ contains
     
     !write(*,*) Temp
 
-    do ll = 1,2
+    do ll = 1,2 !dmr WhatIs ll ? 
        
        call AppHeatCapacity(z_num,Temp,T_freeze,n, organic_ind, Cp, porf, pori)         !Calculation of heat capacity of soil
 
@@ -693,38 +693,38 @@ contains
 
 
       if(EQ1_EQ2==2 .and. z_num ==51)then
-         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0.txt",status="old",action='read') 
+         open(newunit=unit_nb_3,file="Donnee/Temp_soil_0.txt",status="old",action='read') 
       else
-         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
+         open(newunit=unit_nb_3,file="Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
       end if
 
       
 # if Daily == 0
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
-         open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="Donnee/Snow_EQ.txt",status="old",action='read')
+         open(newunit=unit_nb_1,file="Donnee/Temp_Bayevla.txt",status="old",action='read')
 # else
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_day.txt",status="old",action='read')
-         open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="Donnee/Snow_fresh_day.txt",status="old",action='read')
+         open(newunit=unit_nb_1,file="Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
 # endif
 
 
     elseif(EQ_Tr==1)then
 
-       open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Init_Svalbard/Ts_Sv_2.0_0.5_0.2.txt",&
+       open(newunit=unit_nb_3,file="Init_Svalbard/Ts_Sv_2.0_0.5_0.2.txt",&
 status="old",action='read')
-       open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/T_snw_d.txt",status="old",action='read')
-       open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_tot.txt",status="old",action='read')
+       open(newunit=unit_nb_1,file="Donnee/T_snw_d.txt",status="old",action='read')
+       open(newunit=unit_nb_2,file="Donnee/Snow_tot.txt",status="old",action='read')
 
     end if
 
     if (Bool_Bessi==1)then
 
-       open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Snow_dp_1998.txt",status="old",action='read')
-       open(newunit=unit_nb_5,file="/home/users/alambin/VAMPER-F/Donnee/Rho_snow_1998.txt",status="old",action='read')
+       open(newunit=unit_nb_4,file="Donnee/Snow_dp_1998.txt",status="old",action='read')
+       open(newunit=unit_nb_5,file="Donnee/Rho_snow_1998.txt",status="old",action='read')
 
     end if
 
-    !open(newunit=unit_nb_6,file="/home/users/alambin/VAMPER-F/Donnee/T_snw.txt",status="old",action='read')
+    !open(newunit=unit_nb_6,file="Donnee/T_snw.txt",status="old",action='read')
     
     if(EQ1_EQ2==2)then
        
@@ -843,23 +843,23 @@ porf,pori,t_deb,rho_snow_t,snw_dp_t,T_snw_t,D)
     
      if (Bool_layer_temp==1)then
 
-       open(newunit=u_n_23,file="/home/users/alambin/VAMPER-F/Resultats/Tl_23_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_23,file="Resultats/Tl_23_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_53,file="/home/users/alambin/VAMPER-F/Resultats/Tl_53_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_53,file="Resultats/Tl_53_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_93,file="/home/users/alambin/VAMPER-F/Resultats/Tl_93_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_93,file="Resultats/Tl_93_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_143,file="/home/users/alambin/VAMPER-F/Resultats/Tl_143_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_143,file="Resultats/Tl_143_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_250,file="/home/users/alambin/VAMPER-F/Resultats/Tl_250_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_250,file="Resultats/Tl_250_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_350,file="/home/users/alambin/VAMPER-F/Resultats/Tl_350_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_350,file="Resultats/Tl_350_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_550,file="/home/users/alambin/VAMPER-F/Resultats/Tl_550_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_550,file="Resultats/Tl_550_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_900,file="/home/users/alambin/VAMPER-F/Resultats/Tl_900_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_900,file="Resultats/Tl_900_2.0_0.1_0.0.txt",&
 status="replace",action='write') 
-       open(newunit=snw_d,file="/home/users/alambin/VAMPER-F/Resultats/Snw_depth.txt",status="replace",action='write') 
+       open(newunit=snw_d,file="Resultats/Snw_depth.txt",status="replace",action='write') 
 
        layer_temp23 = 28
        layer_temp53 = 35
@@ -870,15 +870,15 @@ status="replace",action='write')
        layer_temp550 = 55
        layer_temp900 = 60
        
-       !open(newunit=u_n_23,file="/home/users/alambin/VAMPER-F/Resultats/Tl_75_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_53,file="/home/users/alambin/VAMPER-F/Resultats/Tl_175_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_93,file="/home/users/alambin/VAMPER-F/Resultats/Tl_375_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_143,file="/home/users/alambin/VAMPER-F/Resultats/Tl_675_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_250,file="/home/users/alambin/VAMPER-F/Resultats/Tl_875_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_350,file="/home/users/alambin/VAMPER-F/Resultats/Tl_1275_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_550,file="/home/users/alambin/VAMPER-F/Resultats/Tl_1675_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_900,file="/home/users/alambin/VAMPER-F/Resultats/Tl_2475_2.0_1.0_1.0.txt",status="replace",action='write') 
-       !open(newunit=snw_d,file="/home/users/alambin/VAMPER-F/Resultats/Snw_depth.txt",status="replace",action='write')
+       !open(newunit=u_n_23,file="Resultats/Tl_75_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_53,file="Resultats/Tl_175_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_93,file="Resultats/Tl_375_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_143,file="Resultats/Tl_675_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_250,file="Resultats/Tl_875_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_350,file="Resultats/Tl_1275_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_550,file="Resultats/Tl_1675_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_900,file="Resultats/Tl_2475_2.0_1.0_1.0.txt",status="replace",action='write') 
+       !open(newunit=snw_d,file="Resultats/Snw_depth.txt",status="replace",action='write')
 
        !layer_temp23 = 57
        !layer_temp53 = 68
