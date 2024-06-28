@@ -94,7 +94,7 @@ program test_fonctions
   !dmr intent(out) (allocatable) n -> allocated in Porosity_init to z_num, contains porosity profile [NOTA: BAD_NAME] 
   !dmr intent(out)               organic_ind = depth of the organic layer? integer value in vertical index
   !dmr intent(out)               Tb = Temperature Bottom, lower boundary condition ... computed from GeoHeatFlow
-  call Vamper_init(z_num,dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
+  call Vamper_init(dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
 
   !dmr [2024-06-28] [ADDING COMMENTS]
   !dmr This subroutine will be reading the forcing from external files. There is a suite of options as to how the forcing is done.

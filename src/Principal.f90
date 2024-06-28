@@ -588,36 +588,48 @@ contains
   end subroutine Vamper
 #endif
 
-  subroutine Vamper_init(z_num,dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
+  subroutine Vamper_init(dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
 
-    integer, intent(in) :: z_num
-    real, dimension(z_num),intent(in) :: dz,D
-    real, dimension(z_num),intent(out):: Cp
-    real, dimension(z_num-1),intent(out):: Kp
+    use Parametrisation, only: z_num
+
+!~     integer, intent(in) :: z_num                                     [TBRMD]
+    
+    real, dimension(z_num),intent(in)          :: dz,D ! geometry of the layers
+    real, dimension(z_num),intent(out)         :: Cp   ! Cp constant ? [TO_BE_CLARIFIED]
+    real, dimension(z_num-1),intent(out)       :: Kp   ! Kp constant ? [TO_BE_CLARIFIED]
+    
     real, dimension(:),allocatable,intent(out) :: time_gi,glacial_ind,n,Temp
+    
     real, intent(out) :: Tb
     integer, intent(out) :: nb_lines
-    integer, intent(out) :: organic_ind
+    integer, intent(out) :: organic_ind ! depth of the organic layer
 
     real, dimension(z_num-1) ::  h_n, h_pori, h_porf
     real, dimension(z_num) :: porf,pori
     integer :: kk,ll
     
-    
+    !dmr [2024-06-28] CALCULATION OF POROSITY in the vertical
+    !dmr   
+    !dmr [NOTA]  The organic layer will be spatial in space, so "n" should be spatial in space in the end, also organic_ind and organic_depth
+    !dmr         Input could be a map of organic_depth
+    !dmr 
+    !dmr intent(in)                PorosityType == 1 or 2 [TO_BE_CLARIFIED]
+    !dmr intent(in)                Bool_Organic == 1 use organic layer, else not
+    !dmr intent(in)                organic_depth = depth of organic layer (I guess), in meters
+    !dmr intent(in) (z_num)        D depth of the layer considered in meters
+    !dmr intent(out) (allocatable) n = porosity of each layer in the vertical
+    !dmr intent(out)               organic_ind, index in vertical of the end of organic layer (1:organic_ind)
+    call Porosity_init(PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
 
-
-    call Porosity_init(z_num, PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
+    !dmr [NOTA] The code below seems to be used to increase the value of n (Porosity ?) if Depth is greater than 1.4 meter ...
     !write(*,*) n
 
     !do kk=1,z_num
-
-     !  if(D(kk)>1.4)then
-
-      !    n(kk) = n(kk) + 0.5
-
+       !if(D(kk)>1.4)then
+       !   n(kk) = n(kk) + 0.5
        !end if
+    !end do
 
-   ! end do
 
     if (Bool_glacial == 1)then
 
@@ -630,14 +642,17 @@ contains
 
     end if
                                 
-    
-    do kk=1,z_num-1
-       
+    !dmr [NOTA] For now it seems that Kp is constant, are there reasons to have it spatially or vertically variable?
+    do kk=1,UBOUND(Kp,DIM=1) !dmr Kp is size z_num-1   
        Kp(kk)=2
-       
     end do
           
-    call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)            
+    !dmr [2024-06-28] CALCULATION OF HeatFlow
+    !dmr   
+
+    allocate(Temp(z_num))
+          
+    call GeoHeatFlow(Gfx, Kp, dz, T_init, Temp)            
 
     Tb = Temp(z_num)                         ! Lower boundary condition 
     
@@ -660,13 +675,6 @@ contains
 
 
   end subroutine Vamper_init
-
-
-
-
-
-
-
 
 
   subroutine Lecture_forcing(z_num,T_air,swe_f_t,snw_dp_t,rho_snow_t,T_snw,Temp,dim_temp,dim_swe)

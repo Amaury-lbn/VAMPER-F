@@ -2,7 +2,7 @@
 
 module Fonction_init
 
-  use Parametrisation, only : n_organic, Porosity_soil
+  use Parametrisation, only : n_organic, Porosity_soil, z_num
   use Para_fonctions, only: indice_minimum
 
   implicit none
@@ -14,11 +14,11 @@ module Fonction_init
 
   !Routine paramettrant la porosité du sol en fonction de la profondeur!
 
-  subroutine Porosity_init(z_num, Porosity_Type, Depth_layer, Bool_Organic, organic_depth, n, organic_ind)
+  subroutine Porosity_init(Porosity_Type, Depth_layer, Bool_Organic, organic_depth, n, organic_ind)
 
     ! Entrées et sorties !
 
-    integer, intent(in) :: z_num, Porosity_Type, Bool_Organic
+    integer, intent(in) :: Porosity_Type, Bool_Organic
     real, intent(in) ::  organic_depth
     real, dimension(:), intent(in) :: Depth_layer
     integer, intent(out) :: organic_ind
@@ -95,15 +95,15 @@ module Fonction_init
 
 
 
-  subroutine GeoHeatFlow(Gfx, Kp, dz, T0, z_num, T)
+  subroutine GeoHeatFlow(Gfx, Kp, dz, T0, T)
    
-    integer, intent(in) :: z_num
-    real, intent(in) :: Gfx, T0
-    real, dimension(z_num), intent(in) :: dz, Kp 
-    real, dimension(:), allocatable, intent(out) :: T
-    integer :: kk
+!~     integer, intent(in) :: z_num
+    real, intent(in)                             :: Gfx, T0 ! Gfx = Earth's geothermal heat flux, T0 is modified top temperature (?)
+    real, dimension(z_num)  , intent(in)         :: dz ! vertical geometry (thickness of layer)
+    real, dimension(z_num-1), intent(in)         :: Kp ! dmr [2024-06-28] : Kp is z_num-1 only ... 
+    real, dimension(z_num)  , intent(out)        :: T  ! new vertical temperature profile
     
-    allocate(T(1:z_num))
+    integer :: kk ! index
 
     T(1) = T0
   
