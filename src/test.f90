@@ -9,7 +9,7 @@ program test_fonctions
 !~   use Parametrisation, only : Bool_layer_temp,Forcage_Month_day,Bool_Swe_Snw,Bool_Model_Snow                        [TBRMD]
 !~   use Fonction_implicit, only : Implicit_snow, Implicit                                                             [TBRMD]
 
-  use Parametrisation, only: z_num
+  use Parametrisation, only: z_num, gridNoMax
 
   !dmr [2024-06-28] Functions used in the main
   use Principal, only : Vamper_init,Lecture_forcing, Vamper_step
@@ -27,21 +27,25 @@ program test_fonctions
   integer :: kk, ll,organic_ind,spy, nb_lines,t_num,dim_temp,dim_swe,t_step,t_deb
   real,dimension(:),allocatable :: time_gi, glacial_ind ! dmr glacial indexes, to be checked with Amaury
   real :: Tb,dt
-  real, dimension(:),allocatable::      T_air     & !dmr [SPAT_VAR], surface air temperature // forcing
-                                       ,Temp      & !dmr [SPAT_VAR], soil temperature over the vertical // prognostic
-                                       ,Kp        & !dmr [CNTST]     heat conductivity constant over the depth, current value is 2
+                                        ! SPATIAL GLOBAL VARIABLES                                       
+  real, dimension(:,:),allocatable::    Temp      & !dmr [SPAT_VAR], soil temperature over the vertical // prognostic
+                                       ,Kp        & !dmr [CNTST]     heat conductivity constant over the depth, current value is 2                                       
                                        ,n         & !dmr [SPAT_VAR], porosity on the vertical
                                        ,Cp        & !dmr [SPAT_VAR]  specific heat capacity
                                        ,pori      & !dmr [???  TBC]
-                                       ,porf      & !dmr [???  TBC]
-                                       ! GEOMETRY VARIABLES
-                                       ,dz        & !dmr [VERTCL]    thickness of the layers
+                                       ,porf        !dmr [???  TBC]
+                                       
+                                       ! GEOMETRY VARIABLES                                       
+  real, dimension(:),allocatable::      dz        & !dmr [VERTCL]    thickness of the layers
                                        ,D         & !dmr [VERTCL]    depth of the layers
                                        ! FORCING VARIABLES
+                                       ,T_air     & !dmr [SPAT_VAR], surface air temperature // forcing                                       
                                        ,swe_f_t   & !dmr [SPAT_VAR]  SWE forcing, allocated to (1:dim_swe) and values read in external text file (unit_nb_2)
                                        ,snow_dp_t & !dmr [SPAT_VAR] snow depth over time forcing ??? 
                                        ,rho_snow_t& !dmr [SPAT_VAR] density of snow over time forcing ???
                                        ,T_snw_t     !dmr [SPAT_VAR] temperature of snow over time forcing ???
+
+  integer, parameter :: gridNo = 1 !! Temporary to test before expanding
 
 
   t_deb = 0
@@ -87,11 +91,12 @@ program test_fonctions
 
   write(*,*) "[MAIN] spy: ", spy
 
-  allocate(Kp(1:z_num-1)) !dmr SPAT_VAR
-  allocate(Cp(1:z_num))   !dmr SPAT_VAR
-  allocate(Temp(1:z_num)) !dmr SPAT_VAR
-  allocate(pori(1:z_num)) !dmr SPAT_VAR
-  allocate(porf(1:z_num)) !dmr SPAT_VAR
+  allocate(Kp(1:z_num-1,1:gridNoMax)) !dmr SPAT_VAR
+  allocate(Cp(1:z_num,1:gridNoMax))   !dmr SPAT_VAR
+  allocate(Temp(1:z_num,1:gridNoMax)) !dmr SPAT_VAR  
+  allocate(n(1:z_num,1:gridNoMax))    !dmr SPAT_VAR
+  allocate(pori(1:z_num,1:gridNoMax)) !dmr SPAT_VAR
+  allocate(porf(1:z_num,1:gridNoMax)) !dmr SPAT_VAR
 
   !dmr [2024-06-28] [ADDING COMMENTS]
   !dmr No spatial dependence till here ...
@@ -108,7 +113,7 @@ program test_fonctions
   !dmr intent(out) (allocatable) n -> allocated in Porosity_init to z_num, contains porosity profile [NOTA: BAD_NAME] 
   !dmr intent(out)               organic_ind = depth of the organic layer? integer value in vertical index
   !dmr intent(out)               Tb = Temperature Bottom, lower boundary condition ... computed from GeoHeatFlow
-  call Vamper_init(dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
+  call Vamper_init(dz,D,Temp(:,gridNo),time_gi,glacial_ind,nb_lines,Kp(:,gridNo),Cp(:,gridNo),n(:,gridNo),organic_ind,Tb)
 
   !dmr [2024-06-28] [ADDING COMMENTS]
   !dmr This subroutine will be reading the forcing from external files. There is a suite of options as to how the forcing is done.
@@ -131,7 +136,7 @@ program test_fonctions
   !dmr intent(out) (allocatable) rho_snow_t   if BESSI, unit_nb_5 else set to zero
   !dmr intent(out) (allocatable) T_snw        if BESSI, unit_nb_6 else ... commented read, nothing done [NOTA: UNINITIALIZED]
 
-  call Lecture_forcing(z_num,T_air,swe_f_t,snow_dp_t,rho_snow_t,T_snw_t,Temp,dim_temp,dim_swe)
+  call Lecture_forcing(z_num,T_air,swe_f_t,snow_dp_t,rho_snow_t,T_snw_t,Temp(:,gridNo),dim_temp,dim_swe)
 
   write(*,*) "[MAIN] D: ", D
   !write(*,*) T_air

@@ -598,7 +598,8 @@ contains
     real, dimension(z_num),intent(out)         :: Cp   ! Cp constant ? [TO_BE_CLARIFIED]
     real, dimension(z_num-1),intent(out)       :: Kp   ! Kp constant ? [TO_BE_CLARIFIED]
     
-    real, dimension(:),allocatable,intent(out) :: time_gi,glacial_ind,n,Temp
+    real, dimension(:),allocatable,intent(out) :: time_gi,glacial_ind
+    real, dimension(:),intent(out)             :: n,Temp
     
     real, intent(out) :: Tb
     integer, intent(out) :: nb_lines
@@ -650,7 +651,7 @@ contains
     !dmr [2024-06-28] CALCULATION OF HeatFlow
     !dmr   
 
-    allocate(Temp(z_num))
+!dmr [TBRMD] already allocated    allocate(Temp(z_num))
           
     call GeoHeatFlow(Gfx, Kp, dz, T_init, Temp)            
 
