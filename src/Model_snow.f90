@@ -71,25 +71,39 @@ module Model_snow
     end subroutine snw_average_snw
 
 
-    subroutine snw_average_snw_tot(snw_tot,snw_tot_old, rho_snow,swe_tot,dt)
+    subroutine snw_average_snw_tot(rho_snow)
       
-      real, intent(in) :: snw_tot, snw_tot_old,dt
-      real, intent(inout) :: rho_snow,swe_tot
-      real :: swe_f
-
-      
+      real, intent(out) :: rho_snow
+            
       rho_snow = 10.0*36*2.3
 
 
     end subroutine snw_average_snw_tot
+
+
+
+
+!~     subroutine snw_average_snw_tot(snw_tot,snw_tot_old, rho_snow,swe_tot,dt)
+      
+!~       real, intent(in) :: snw_tot, snw_tot_old,dt
+!~       real, intent(inout) :: rho_snow,swe_tot
+!~       real :: swe_f
+
+      
+!~       rho_snow = 10.0*36*2.3
+
+
+!~     end subroutine snw_average_snw_tot
  
 
 
 
 
-    subroutine snw_proc(Tsnw,T_soil, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+    subroutine snw_proc(Tsnw, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+!dmr [UNUSED]    subroutine snw_proc(Tsnw,T_soil, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)    
 
-      real, intent(inout) :: Tsnw,T_soil, snw_tot, swe_tot, frac_snw, rho_snow
+      real, intent(inout) :: Tsnw, snw_tot, swe_tot, frac_snw, rho_snow
+!dmr [UNUSED]      real, intent(inout) :: Tsnw,T_soil, snw_tot, swe_tot, frac_snw, rho_snow      
       real, intent(in) :: Cp_snow, dt
       real :: frac_snw_old, rho_snow_old, swe_melt, H_1, H_2, N, var, rho_snow_new
 

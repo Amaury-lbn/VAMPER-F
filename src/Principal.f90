@@ -1029,10 +1029,13 @@ glacial_ind(indice_tab-1))/100.0)
 
           !T_soil = T_snw_t(mod(ll,dim_temp)+1)
 
-          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Kp) 
+!dmr [UNUSED]          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+
 
           if (Bool_Bessi==0) then
-             call snw_proc(Tsnw(1),Temp(1), snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+             call snw_proc(Tsnw(1), snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+!dmr [UNUSED]             call snw_proc(Tsnw(1),Temp(1), snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
           end if
           
        else
@@ -1048,7 +1051,8 @@ glacial_ind(indice_tab-1))/100.0)
 
           !T_soil = T_snw_t(mod(ll,dim_temp)+1)
 
-          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Kp) 
+!dmr [UNUSED          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp)           
           
 
        end if

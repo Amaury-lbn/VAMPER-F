@@ -85,12 +85,12 @@ program test_fonctions
   !dmr intent(in)                z_num == number of vertical slices
   !dmr intent(in)                dz = vertical stepping
   !dmr intent(in)                D is provided to porosity_init as depth_layer(z_num)
-  !dmr intent(out) (allocatable) Temp = a form of temperature (which one?)
+  !dmr intent(out) (allocatable) Temp = temperature of the soil for all vertical layers
   !dmr intent(out) (allocatable) time_gi = years B.P. in the glacial index file (I think)
   !dmr intent(out) (allocatable) glacial_ind = array for glacial indexing, if not, then glacial_ind(1) = 0
   !dmr intent(out)               nb_lines = number of lines in the glacial index file, read in that file
-  !dmr intent(out)               Kp = constant over the depth, current value is 2
-  !dmr intent(out)               Cp 
+  !dmr intent(out)               Kp = heat conductivity constant over the depth, current value is 2
+  !dmr intent(out)               Cp = specific heat capacity
   !dmr intent(out) (allocatable) n -> allocated in Porosity_init to z_num, contains porosity profile [NOTA: BAD_NAME] 
   !dmr intent(out)               organic_ind = depth of the organic layer? integer value in vertical index
   !dmr intent(out)               Tb = Temperature Bottom, lower boundary condition ... computed from GeoHeatFlow
@@ -139,10 +139,10 @@ program test_fonctions
   !dmr intent(inout) (z_num)     n
   !dmr intent(inout) (z_num)     porf
   !dmr intent(inout) (z_num)     pori
-  !dmr intent(inout) (z_num)     Kp
+  !dmr intent(inout) (z_num)     Kp            / Conductivité thermique, dépend de la température
   !dmr intent(inout) (z_num)     Cp
   !dmr intent(inout) (z_num)     D
-  !dmr intent(inout) (z_num)     Temp
+  !dmr intent(inout) (z_num)     Temp          / Amaury dixit: température à l'initialisation puis température du sol calculée 
   
   !dmr intent(in)    (dim_swe)   swe_f_t       / SWE forcing data
   !dmr intent(in)    (dim_temp)  T_air         / Air temperature forcing data
