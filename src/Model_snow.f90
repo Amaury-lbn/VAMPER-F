@@ -4,8 +4,12 @@ module Model_snow
 
   use Parametrisation, only : Latent_heat, rho_water, rho_snow_freeze, gravity, rho_snow_fresh
 
-  Implicit none
+  implicit none
 
+  private
+  
+  public :: snw_average_swe, snw_average_snw, snw_average_snw_tot, snw_proc
+  
   contains
 
     
@@ -67,25 +71,39 @@ module Model_snow
     end subroutine snw_average_snw
 
 
-    subroutine snw_average_snw_tot(snw_tot,snw_tot_old, rho_snow,swe_tot,dt)
+    subroutine snw_average_snw_tot(rho_snow)
       
-      real, intent(in) :: snw_tot, snw_tot_old,dt
-      real, intent(inout) :: rho_snow,swe_tot
-      real :: swe_f
-
-      
+      real, intent(out) :: rho_snow
+            
       rho_snow = 10.0*36*2.3
 
 
     end subroutine snw_average_snw_tot
+
+
+
+
+!~     subroutine snw_average_snw_tot(snw_tot,snw_tot_old, rho_snow,swe_tot,dt)
+      
+!~       real, intent(in) :: snw_tot, snw_tot_old,dt
+!~       real, intent(inout) :: rho_snow,swe_tot
+!~       real :: swe_f
+
+      
+!~       rho_snow = 10.0*36*2.3
+
+
+!~     end subroutine snw_average_snw_tot
  
 
 
 
 
-    subroutine snw_proc(Tsnw,T_soil, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+    subroutine snw_proc(Tsnw, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+!dmr [UNUSED]    subroutine snw_proc(Tsnw,T_soil, snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)    
 
-      real, intent(inout) :: Tsnw,T_soil, snw_tot, swe_tot, frac_snw, rho_snow
+      real, intent(inout) :: Tsnw, snw_tot, swe_tot, frac_snw, rho_snow
+!dmr [UNUSED]      real, intent(inout) :: Tsnw,T_soil, snw_tot, swe_tot, frac_snw, rho_snow      
       real, intent(in) :: Cp_snow, dt
       real :: frac_snw_old, rho_snow_old, swe_melt, H_1, H_2, N, var, rho_snow_new
 
@@ -103,7 +121,7 @@ module Model_snow
             frac_snw = 1-(H_1/H_2)
             !write(*,*) snw_tot
             snw_tot = frac_snw * snw_tot
-            write(*,*) frac_snw, Tsnw, snw_tot
+            write(*,*) "[MOD_SNW] frac_snw, Tsnw, snw_tot: ", frac_snw, Tsnw, snw_tot
             Tsnw = 0.0
             !write(*,*) "H1<H2"
          else

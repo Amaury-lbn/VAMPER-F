@@ -2,21 +2,23 @@
 
 module Fonction_init
 
-  use Parametrisation, only : n_organic, Porosity_soil
-  use Para_fonctions
+  use Parametrisation, only : n_organic, Porosity_soil, z_num
+  use Para_fonctions, only: indice_minimum
 
-  Implicit none
+  implicit none
 
+  private
+  public :: Porosity_init, GeoHeatFlow, Glacial_index
 
   contains
 
   !Routine paramettrant la porosité du sol en fonction de la profondeur!
 
-  subroutine Porosity_init(z_num, Porosity_Type, Depth_layer, Bool_Organic, organic_depth, n, organic_ind)
+  subroutine Porosity_init(Porosity_Type, Depth_layer, Bool_Organic, organic_depth, n, organic_ind)
 
     ! Entrées et sorties !
 
-    integer, intent(in) :: z_num, Porosity_Type, Bool_Organic
+    integer, intent(in) :: Porosity_Type, Bool_Organic
     real, intent(in) ::  organic_depth
     real, dimension(:), intent(in) :: Depth_layer
     integer, intent(out) :: organic_ind
@@ -93,15 +95,15 @@ module Fonction_init
 
 
 
-  subroutine GeoHeatFlow(Gfx, Kp, dz, T0, z_num, T)
+  subroutine GeoHeatFlow(Gfx, Kp, dz, T0, T)
    
-    integer, intent(in) :: z_num
-    real, intent(in) :: Gfx, T0
-    real, dimension(z_num), intent(in) :: dz, Kp 
-    real, dimension(:), allocatable, intent(out) :: T
-    integer :: kk
+!~     integer, intent(in) :: z_num
+    real, intent(in)                             :: Gfx, T0 ! Gfx = Earth's geothermal heat flux, T0 is modified top temperature (?)
+    real, dimension(z_num)  , intent(in)         :: dz ! vertical geometry (thickness of layer)
+    real, dimension(z_num-1), intent(in)         :: Kp ! dmr [2024-06-28] : Kp is z_num-1 only ... 
+    real, dimension(z_num)  , intent(out)        :: T  ! new vertical temperature profile
     
-    allocate(T(1:z_num))
+    integer :: kk ! index
 
     T(1) = T0
   
@@ -120,14 +122,14 @@ module Fonction_init
     integer,intent(out) :: nb_lines
     integer :: unit_number4,ll
     real :: time_temp, niveau_eau,glacial_ind_temp,kk
-    character(len=8) :: char
+    character(len=8) :: char ! [NOTA : BAD NAME] (char is a reserved word in FORTRAN)
 
 
-    open(newunit=unit_number4,file="/home/users/alambin/VAMPER-F/Donnee/Glacial_index.txt",status="old",action='read') 
+    open(newunit=unit_number4,file="Donnee/Glacial_index.txt",status="old",action='read') 
     
     read(unit_number4,*) char, nb_lines
 
-    write(*,*) nb_lines
+    write(*,*) "[FONC_INIT] nb_lines: ", nb_lines
     
     allocate(time_gi(1:nb_lines))
     allocate(glacial_ind(1:nb_lines))

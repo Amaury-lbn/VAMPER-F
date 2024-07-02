@@ -1,7 +1,9 @@
 module Parametrisation
 
   
-  Implicit none
+  implicit none
+  
+  public !dmr here can be fully public, these are only parameter constants
 
   integer,parameter :: TotTime = 400000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
@@ -13,8 +15,8 @@ module Parametrisation
   integer,parameter :: PorosityType = 3       !(1) linéaire, (autre) exponentiellement décroissante en fonction de la profondeur
   integer,parameter :: Bool_Snow = 1          ! forçage en neige ou non (1 ou 0)
   integer,parameter :: Bool_Organic = 1       ! prise en compte de la couche organique ou non (1 ou 0)
-  integer, parameter :: EQ_Tr = 1             ! Equilibrum run (0) or Transient run (1) -> using different forcing Temperature and snow
-  integer, parameter :: EQ1_EQ2 = 2           ! EQ1(1) initial temperature calculated with the Geothermal heat flux. EQ2 initial temperature read in a file .txt
+  integer, parameter :: EQ_Tr = 0             ! Equilibrum run (0) or Transient run (1) -> using different forcing Temperature and snow
+  integer, parameter :: EQ1_EQ2 = 1           ! EQ1(1) initial temperature calculated with the Geothermal heat flux. EQ2 initial temperature read in a file .txt
   integer, parameter :: Bool_delta = 0        ! 
   integer, parameter :: Bool_glacial = 0          ! Using glacial index to modify air temperature
   integer, parameter :: Bool_layer_temp = 1       ! Creation of .txt with the temperature of the soil at different layer
@@ -67,8 +69,8 @@ module Parametrisation
 
   integer, parameter :: s_l_max = 2      ! nombre de couche de neige (marche que avec 1)
 
-
-
+  !dmr spatialisation
+  integer, parameter :: nb_points = 100 !dmr start with a 10x10 square
   
 end module Parametrisation
 

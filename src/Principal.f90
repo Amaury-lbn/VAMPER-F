@@ -8,9 +8,13 @@ module Principal
   use Fonction_init, only : Porosity_init, GeoHeatFlow, Glacial_index
   use Para_fonctions, only : t_disc, z_disc
   use Model_snow, only : snw_average_swe, snw_proc, snw_average_snw, snw_average_snw_tot
-  use Fonction_implicit, only : Implicit_snow, Implicit
+  use Fonction_implicit, only : Implicit_snow, Implicit_T
  
   Implicit none
+  
+  private !dmr making sure local variables are local, hence private
+  
+  public :: Vamper_init, Lecture_forcing, Vamper_step
   
   integer :: u_n_23,u_n_53,u_n_93,u_n_143,u_n_250,u_n_350,u_n_550,u_n_900
   integer :: layer_temp23,layer_temp53,layer_temp93,layer_temp143,layer_temp250,layer_temp350,layer_temp550,layer_temp900
@@ -18,10 +22,11 @@ module Principal
 
 # include "constant.h"
 
-
-
 contains
 
+#define OLD_VAMP 0
+
+#if ( OLD_VAMP == 1 )
   subroutine Vamper(Temp, Soil_temp, snw_totals)
     
     integer :: t_num, kk, organic_ind, ll, nb_lines,spy, indice_tab,ind_days,snw_d,s_l_t
@@ -95,7 +100,7 @@ contains
     
     end if
     
-    write(*,*) D
+    write(*,*) "[PRINC] 1|D: ", D
     !write(*,*) dz
     Day_per_month(1) = 31
     Day_per_month(2) = 28
@@ -144,45 +149,45 @@ contains
           layer_temp900 = 60
 
        end if
-       open(newunit=u_n_23,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_23.txt",status="replace",action='write')
-       open(newunit=u_n_53,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_53.txt",status="replace",action='write')
-       open(newunit=u_n_93,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_93.txt",status="replace",action='write')
-       open(newunit=u_n_143,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_143.txt",status="replace",action='write')
-       open(newunit=u_n_250,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_250.txt",status="replace",action='write')
-       open(newunit=u_n_350,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_350.txt",status="replace",action='write')
-       open(newunit=u_n_550,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_550.txt",status="replace",action='write')
-       open(newunit=u_n_900,file="/home/users/alambin/VAMPER-F/Resultats/Temp_layer_900.txt",status="replace",action='write') 
-       open(newunit=snw_d,file="/home/users/alambin/VAMPER-F/Resultats/Snw_depth.txt",status="replace",action='write') 
+       open(newunit=u_n_23,file="Resultats/Temp_layer_23.txt",status="replace",action='write')
+       open(newunit=u_n_53,file="Resultats/Temp_layer_53.txt",status="replace",action='write')
+       open(newunit=u_n_93,file="Resultats/Temp_layer_93.txt",status="replace",action='write')
+       open(newunit=u_n_143,file="Resultats/Temp_layer_143.txt",status="replace",action='write')
+       open(newunit=u_n_250,file="Resultats/Temp_layer_250.txt",status="replace",action='write')
+       open(newunit=u_n_350,file="Resultats/Temp_layer_350.txt",status="replace",action='write')
+       open(newunit=u_n_550,file="Resultats/Temp_layer_550.txt",status="replace",action='write')
+       open(newunit=u_n_900,file="Resultats/Temp_layer_900.txt",status="replace",action='write') 
+       open(newunit=snw_d,file="Resultats/Snw_depth.txt",status="replace",action='write') 
     end if
 
     if (EQ_Tr == 0)then
 
-      open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_under_ice.txt",status="old",action='read')
+      open(newunit=unit_nb_1,file="Donnee/Temp_under_ice.txt",status="old",action='read')
       
 
       if(EQ1_EQ2==2 .and. z_num ==51)then
-         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0.txt",status="old",action='read') 
+         open(newunit=unit_nb_3,file="Donnee/Temp_soil_0.txt",status="old",action='read') 
       else
-         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
+         open(newunit=unit_nb_3,file="Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
       end if
       
       if (Forcage_Month_day == 0)then
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
-         open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="Donnee/Snow_EQ.txt",status="old",action='read')
+         open(newunit=unit_nb_4,file="Donnee/Temp_Bayevla.txt",status="old",action='read')
       else
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_day.txt",status="old",action='read')
-         open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="Donnee/Snow_fresh_day.txt",status="old",action='read')
+         open(newunit=unit_nb_4,file="Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
       end if
 
       if (Bool_Model_Snow==0)then
-         open(newunit=unit_nb_5,file="/home/users/alambin/VAMPER-F/Donnee/Snow_tot.txt",status="old",action='read')
+         open(newunit=unit_nb_5,file="Donnee/Snow_tot.txt",status="old",action='read')
       end if
 
     elseif(EQ_Tr==1)then
 
-       open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_1998.txt",status="old",action='read')
-       open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_18y_day.txt",status="old",action='read')
-       open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Swe_18y_day.txt",status="old",action='read')
+       open(newunit=unit_nb_3,file="Donnee/Temp_soil_1998.txt",status="old",action='read')
+       open(newunit=unit_nb_1,file="Donnee/Temp_18y_day.txt",status="old",action='read')
+       open(newunit=unit_nb_2,file="Donnee/Swe_18y_day.txt",status="old",action='read')
 
     end if
     
@@ -190,7 +195,7 @@ contains
 !----------INITIALISATION----------!   
 
     call Porosity_init(z_num, PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
-    write(*,*) n
+    write(*,*) "[PRINC] n:",  n
 
     if (Bool_glacial == 1)then
 
@@ -280,7 +285,7 @@ contains
     end if
 
     Tb = Temp(z_num)                         ! Lower boundary condition 
-    write(*,*) Temp
+    write(*,*) "[PRINC] Temp: ",  Temp
 
     do ll = 1,2
        
@@ -368,7 +373,7 @@ contains
              indice_tab = nb_lines-floor((-(ll/12.0)+t_fin+TotTime)/100.0)
              T_soil=alpha*(glacial_ind(indice_tab-1)+mod((ll/12.0),100.0)*(glacial_ind(indice_tab)-glacial_ind(indice_tab-1))/100.0)
              T_soil = (T_air(mod(ll,12)+1)+T_soil)
-             write(*,*) T_soil
+             write(*,*) "[PRINC] T_soil: ", T_soil
 
           elseif( Forcage_Month_day == 1)then
 
@@ -451,11 +456,11 @@ contains
           
           if (EQ_Tr == 0)then
 
-             call Implicit(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp_t,Kp) 
+             call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp_t,Kp) 
           
           else
 
-             call Implicit(T_old,T_air(ll),Tb,dt,dz,n,organic_ind,Temp,Cp_t,Kp)
+             call Implicit_T(T_old,T_air(ll),Tb,dt,dz,n,organic_ind,Temp,Cp_t,Kp)
 
           end if
     
@@ -491,7 +496,7 @@ contains
                  
        if (mod(ll,120000) == 0) then
 
-          write(*,*) indice_tab, nb_lines
+          write(*,*) "[PRINC] indice_tab, nb_lines: ", indice_tab, nb_lines
 
           do kk=1,z_num
              
@@ -502,7 +507,7 @@ contains
              end if
                 
           end do
-          write(*,*) ll , Temp
+          write(*,*) "[PRINC] ll, Temp: ", ll , Temp
           
        end if
        
@@ -517,8 +522,8 @@ contains
                 Soil_temp_moy(kk) = sum(Soil_temp(kk,1:365))/365.0
                 
              end do
-             write(*,*) ll
-             write(*,*) "Soil_temp_moy =" , Soil_temp_moy
+             write(*,*) "[PRINC] ll: ", ll
+             write(*,*) "[PRINC] Soil_temp_moy: " , Soil_temp_moy
              !write(*,*) "delta_t_moy =" , delta_t_moy 
 
           end if
@@ -560,12 +565,12 @@ contains
 
        G0_23 = Kp(layer_temp23)*(Temp(layer_temp23)-Temp(1))/D(layer_temp23)
        
-       write(*,*) G0_23, G0_18,Cp_snow, T_soil,snw_tot
+       write(*,*) "[PRINC] G0_23, G0_18,Cp_snow, T_soil,snw_tot: ", G0_23, G0_18,Cp_snow, T_soil,snw_tot
 
        
        
     end do
-    write(*,*) D
+    write(*,*) "[PRINC] 2|D: ", D
 
     
     if (Bool_layer_temp==1)then
@@ -581,49 +586,50 @@ contains
     end if
 
   end subroutine Vamper
+#endif
 
+  subroutine Vamper_init(dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
 
+    use Parametrisation, only: z_num
 
-
-
-
-
-
-
-
-
-
-
-  subroutine Vamper_init(z_num,dz,D,Temp,time_gi,glacial_ind,nb_lines,Kp,Cp,n,organic_ind,Tb)
-
-    integer, intent(in) :: z_num
-    real, dimension(z_num),intent(in) :: dz,D
-    real, dimension(z_num),intent(out):: Cp
-    real, dimension(z_num-1),intent(out):: Kp
+!~     integer, intent(in) :: z_num                                     [TBRMD]
+    
+    real, dimension(z_num),intent(in)          :: dz,D ! geometry of the layers
+    real, dimension(z_num),intent(out)         :: Cp   ! Cp constant ? [TO_BE_CLARIFIED]
+    real, dimension(z_num-1),intent(out)       :: Kp   ! Kp constant ? [TO_BE_CLARIFIED]
+    
     real, dimension(:),allocatable,intent(out) :: time_gi,glacial_ind,n,Temp
+    
     real, intent(out) :: Tb
     integer, intent(out) :: nb_lines
-    integer, intent(out) :: organic_ind
+    integer, intent(out) :: organic_ind ! depth of the organic layer
 
     real, dimension(z_num-1) ::  h_n, h_pori, h_porf
     real, dimension(z_num) :: porf,pori
     integer :: kk,ll
     
-    
+    !dmr [2024-06-28] CALCULATION OF POROSITY in the vertical
+    !dmr   
+    !dmr [NOTA]  The organic layer will be spatial in space, so "n" should be spatial in space in the end, also organic_ind and organic_depth
+    !dmr         Input could be a map of organic_depth
+    !dmr 
+    !dmr intent(in)                PorosityType == 1 or 2 [TO_BE_CLARIFIED]
+    !dmr intent(in)                Bool_Organic == 1 use organic layer, else not
+    !dmr intent(in)                organic_depth = depth of organic layer (I guess), in meters
+    !dmr intent(in) (z_num)        D depth of the layer considered in meters
+    !dmr intent(out) (allocatable) n = porosity of each layer in the vertical
+    !dmr intent(out)               organic_ind, index in vertical of the end of organic layer (1:organic_ind)
+    call Porosity_init(PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
 
-
-    call Porosity_init(z_num, PorosityType, D, Bool_Organic, organic_depth, n, organic_ind )  !CALCULATION OF POROSITY
+    !dmr [NOTA] The code below seems to be used to increase the value of n (Porosity ?) if Depth is greater than 1.4 meter ...
     !write(*,*) n
 
     !do kk=1,z_num
-
-     !  if(D(kk)>1.4)then
-
-      !    n(kk) = n(kk) + 0.5
-
+       !if(D(kk)>1.4)then
+       !   n(kk) = n(kk) + 0.5
        !end if
+    !end do
 
-   ! end do
 
     if (Bool_glacial == 1)then
 
@@ -636,20 +642,23 @@ contains
 
     end if
                                 
-    
-    do kk=1,z_num-1
-       
+    !dmr [NOTA] For now it seems that Kp is constant, are there reasons to have it spatially or vertically variable?
+    do kk=1,UBOUND(Kp,DIM=1) !dmr Kp is size z_num-1   
        Kp(kk)=2
-       
     end do
           
-    call GeoHeatFlow(Gfx, Kp, dz, T_init, z_num, Temp)            
+    !dmr [2024-06-28] CALCULATION OF HeatFlow
+    !dmr   
+
+    allocate(Temp(z_num))
+          
+    call GeoHeatFlow(Gfx, Kp, dz, T_init, Temp)            
 
     Tb = Temp(z_num)                         ! Lower boundary condition 
     
     !write(*,*) Temp
 
-    do ll = 1,2
+    do ll = 1,2 !dmr WhatIs ll ? 
        
        call AppHeatCapacity(z_num,Temp,T_freeze,n, organic_ind, Cp, porf, pori)         !Calculation of heat capacity of soil
 
@@ -666,13 +675,6 @@ contains
 
 
   end subroutine Vamper_init
-
-
-
-
-
-
-
 
 
   subroutine Lecture_forcing(z_num,T_air,swe_f_t,snw_dp_t,rho_snow_t,T_snw,Temp,dim_temp,dim_swe)
@@ -693,38 +695,38 @@ contains
 
 
       if(EQ1_EQ2==2 .and. z_num ==51)then
-         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0.txt",status="old",action='read') 
+         open(newunit=unit_nb_3,file="Donnee/Temp_soil_0.txt",status="old",action='read') 
       else
-         open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
+         open(newunit=unit_nb_3,file="Donnee/Temp_soil_0_z101.txt",status="old",action='read') 
       end if
 
       
 # if Daily == 0
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_EQ.txt",status="old",action='read')
-         open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temp_Bayevla.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="Donnee/Snow_EQ.txt",status="old",action='read')
+         open(newunit=unit_nb_1,file="Donnee/Temp_Bayevla.txt",status="old",action='read')
 # else
-         open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_fresh_day.txt",status="old",action='read')
-         open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
+         open(newunit=unit_nb_2,file="Donnee/Snow_fresh_day.txt",status="old",action='read')
+         open(newunit=unit_nb_1,file="Donnee/Temperature_moyenne_jour.txt",status="old",action='read')
 # endif
 
 
     elseif(EQ_Tr==1)then
 
-       open(newunit=unit_nb_3,file="/home/users/alambin/VAMPER-F/Init_Svalbard/Ts_Sv_2.0_0.5_0.2.txt",&
+       open(newunit=unit_nb_3,file="Init_Svalbard/Ts_Sv_2.0_0.5_0.2.txt",&
 status="old",action='read')
-       open(newunit=unit_nb_1,file="/home/users/alambin/VAMPER-F/Donnee/T_snw_d.txt",status="old",action='read')
-       open(newunit=unit_nb_2,file="/home/users/alambin/VAMPER-F/Donnee/Snow_tot.txt",status="old",action='read')
+       open(newunit=unit_nb_1,file="Donnee/T_snw_d.txt",status="old",action='read')
+       open(newunit=unit_nb_2,file="Donnee/Snow_tot.txt",status="old",action='read')
 
     end if
 
     if (Bool_Bessi==1)then
 
-       open(newunit=unit_nb_4,file="/home/users/alambin/VAMPER-F/Donnee/Snow_dp_1998.txt",status="old",action='read')
-       open(newunit=unit_nb_5,file="/home/users/alambin/VAMPER-F/Donnee/Rho_snow_1998.txt",status="old",action='read')
+       open(newunit=unit_nb_4,file="Donnee/Snow_dp_1998.txt",status="old",action='read')
+       open(newunit=unit_nb_5,file="Donnee/Rho_snow_1998.txt",status="old",action='read')
 
     end if
 
-    !open(newunit=unit_nb_6,file="/home/users/alambin/VAMPER-F/Donnee/T_snw.txt",status="old",action='read')
+    !open(newunit=unit_nb_6,file="Donnee/T_snw.txt",status="old",action='read')
     
     if(EQ1_EQ2==2)then
        
@@ -843,23 +845,23 @@ porf,pori,t_deb,rho_snow_t,snw_dp_t,T_snw_t,D)
     
      if (Bool_layer_temp==1)then
 
-       open(newunit=u_n_23,file="/home/users/alambin/VAMPER-F/Resultats/Tl_23_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_23,file="Resultats/Tl_23_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_53,file="/home/users/alambin/VAMPER-F/Resultats/Tl_53_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_53,file="Resultats/Tl_53_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_93,file="/home/users/alambin/VAMPER-F/Resultats/Tl_93_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_93,file="Resultats/Tl_93_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_143,file="/home/users/alambin/VAMPER-F/Resultats/Tl_143_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_143,file="Resultats/Tl_143_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_250,file="/home/users/alambin/VAMPER-F/Resultats/Tl_250_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_250,file="Resultats/Tl_250_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_350,file="/home/users/alambin/VAMPER-F/Resultats/Tl_350_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_350,file="Resultats/Tl_350_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_550,file="/home/users/alambin/VAMPER-F/Resultats/Tl_550_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_550,file="Resultats/Tl_550_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_900,file="/home/users/alambin/VAMPER-F/Resultats/Tl_900_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_900,file="Resultats/Tl_900_2.0_0.1_0.0.txt",&
 status="replace",action='write') 
-       open(newunit=snw_d,file="/home/users/alambin/VAMPER-F/Resultats/Snw_depth.txt",status="replace",action='write') 
+       open(newunit=snw_d,file="Resultats/Snw_depth.txt",status="replace",action='write') 
 
        layer_temp23 = 28
        layer_temp53 = 35
@@ -870,15 +872,15 @@ status="replace",action='write')
        layer_temp550 = 55
        layer_temp900 = 60
        
-       !open(newunit=u_n_23,file="/home/users/alambin/VAMPER-F/Resultats/Tl_75_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_53,file="/home/users/alambin/VAMPER-F/Resultats/Tl_175_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_93,file="/home/users/alambin/VAMPER-F/Resultats/Tl_375_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_143,file="/home/users/alambin/VAMPER-F/Resultats/Tl_675_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_250,file="/home/users/alambin/VAMPER-F/Resultats/Tl_875_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_350,file="/home/users/alambin/VAMPER-F/Resultats/Tl_1275_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_550,file="/home/users/alambin/VAMPER-F/Resultats/Tl_1675_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_900,file="/home/users/alambin/VAMPER-F/Resultats/Tl_2475_2.0_1.0_1.0.txt",status="replace",action='write') 
-       !open(newunit=snw_d,file="/home/users/alambin/VAMPER-F/Resultats/Snw_depth.txt",status="replace",action='write')
+       !open(newunit=u_n_23,file="Resultats/Tl_75_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_53,file="Resultats/Tl_175_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_93,file="Resultats/Tl_375_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_143,file="Resultats/Tl_675_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_250,file="Resultats/Tl_875_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_350,file="Resultats/Tl_1275_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_550,file="Resultats/Tl_1675_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_900,file="Resultats/Tl_2475_2.0_1.0_1.0.txt",status="replace",action='write') 
+       !open(newunit=snw_d,file="Resultats/Snw_depth.txt",status="replace",action='write')
 
        !layer_temp23 = 57
        !layer_temp53 = 68
@@ -906,7 +908,7 @@ status="replace",action='write')
     snw_old = 0
     ind_snw = 0
     s_l_t = 1
-    write(*,*) organic_ind
+    write(*,*) "[PRINC] organic_ind: ", organic_ind
     
     do kk =1,s_l_max
 
@@ -1027,10 +1029,13 @@ glacial_ind(indice_tab-1))/100.0)
 
           !T_soil = T_snw_t(mod(ll,dim_temp)+1)
 
-          call Implicit(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Kp) 
+!dmr [UNUSED]          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+
 
           if (Bool_Bessi==0) then
-             call snw_proc(Tsnw(1),Temp(1), snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+             call snw_proc(Tsnw(1), snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
+!dmr [UNUSED]             call snw_proc(Tsnw(1),Temp(1), snw_tot, swe_tot, frac_snw, Cp_snow, rho_snow, dt)
           end if
           
        else
@@ -1046,7 +1051,8 @@ glacial_ind(indice_tab-1))/100.0)
 
           !T_soil = T_snw_t(mod(ll,dim_temp)+1)
 
-          call Implicit(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp) 
+          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Kp) 
+!dmr [UNUSED          call Implicit_T(T_old,T_soil,Tb,dt,dz,n,organic_ind,Temp,Cp,Kp)           
           
 
        end if
@@ -1072,7 +1078,7 @@ glacial_ind(indice_tab-1))/100.0)
        end if
 
        call Permafrost_Depth(Temp,D,Per_depth)
-       write(*,*) Per_depth
+       write(*,*) "[PRINC] Per_depth: ", Per_depth
        
        !write(*,*) Kp
 
@@ -1080,9 +1086,10 @@ glacial_ind(indice_tab-1))/100.0)
 
     t_deb = t_deb - floor(t_step/365.0)
 
-    write(*,*) indice_tab,t_num,organic_ind
+    if (Bool_glacial.eq.1) then !dmr indice_tab is undefined if Bool_glacial is not 1
+      write(*,*) "[PRINC] indice_tab,t_num,organic_ind: ", indice_tab,t_num,organic_ind
     !write(u_n_23,*) Kp
-
+    endif
    
     if (Bool_layer_temp==1)then
        write(u_n_23,*) T_layer23

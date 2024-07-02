@@ -4,14 +4,19 @@ module Fonction_implicit
   use Parametrisation, only : z_num, rho_ice, Gfx, T_freeze,rho_snow_freeze,s_l_max
   use Fonction_temp, only : AppHeatCapacity, ThermalConductivity
 
-  Implicit none
+  implicit none
+
+  private
+  public :: Implicit_T, Implicit_snow
 
   contains
 
-    subroutine Implicit_snow(snw_dp,rho_snow,Tsnw,T_old,Tu,dt,dz,n,org_ind,Timp,Cp,Kp,Cp_snow,s_l)
-      
+    subroutine Implicit_snow(snw_dp,Tsnw,T_old,Tu,dt,dz,n,org_ind,Timp,Cp,Kp,Cp_snow,s_l)
+!dmr [UNUSED]    subroutine Implicit_snow(snw_dp,rho_snow,Tsnw,T_old,Tu,dt,dz,n,org_ind,Timp,Cp,Kp,Cp_snow,s_l)
+          
       integer, intent(in) :: org_ind,s_l
-      real, intent(in) ::  snw_dp, rho_snow, dt,Tu
+      real, intent(in) ::  snw_dp, dt,Tu
+!dmr [UNUSED]      real, intent(in) ::  snw_dp, rho_snow, dt,Tu      
       real, dimension(z_num), intent(inout) :: T_old, n, dz
       real, dimension(s_l_max), intent(inout) :: Tsnw
       real, intent(out) :: Cp_snow
@@ -22,17 +27,18 @@ module Fonction_implicit
      
       real, dimension(z_num+s_l) ::  Kp_s, T_last, n_s, dz_s, K_s
       real, dimension(:), allocatable :: Cp_s, porf, pori
-      real, dimension(z_num) ::Cp_temp, porf_temp, pori_temp, T_new
+      real, dimension(z_num) ::Cp_temp, porf_temp, pori_temp !dmr [UNUSED], T_new
       real, dimension(z_num+s_l) :: T_iter
       real, dimension(z_num+s_l,z_num+s_l) :: MM
       real, dimension(z_num+s_l) :: DD
       real, dimension(z_num+s_l-1) :: DL, DU
       real, dimension(z_num+s_l) :: Knows
-      real, dimension(s_l) :: D
+!dmr [UNUSED]      real, dimension(s_l) :: D
       real :: m_Gfx, A, B, C, Z1
-      integer :: kk, ll, z_s,ind_snw
+      integer :: kk, ll, z_s
+!dmr [UNUSED]      integer :: kk, ll, z_s,ind_snw      
 
-      integer, dimension(z_num+s_l) :: IPIV
+!dmr [UNUSED]      integer, dimension(z_num+s_l) :: IPIV
       integer :: info_dgesv
 
 
@@ -72,7 +78,7 @@ module Fonction_implicit
          T_last(kk) = Tsnw(kk)
       end do
       
-      write(*,*) K_s(1), Cp_s(1)
+      write(*,*) "[FONC_IMP] K_s, Cp_s: ", K_s(1), Cp_s(1)
       
       !write(*,*)"T_last=", T_last
      
@@ -178,24 +184,26 @@ module Fonction_implicit
     end subroutine Implicit_snow
 
 
-    subroutine Implicit(T_old,Tu,Tb,dt,dz,n,org_ind,Timp,Cp,Kp)
+    subroutine Implicit_T(T_old,Tu,Tb,dt,dz,n,org_ind,Timp,Kp)
+!dmr [UNUSED]   subroutine Implicit_T(T_old,Tu,Tb,dt,dz,n,org_ind,Timp,Cp,Kp)    
       
       integer, intent(in) :: org_ind
       real, intent(in) :: dt,Tu,Tb
       real, dimension(:), intent(in) :: T_old, n, dz
       real, dimension(z_num), intent(out) :: Timp, Kp
-      real, dimension(z_num), intent(out) :: Cp
+!dmr [UNUSED]      real, dimension(z_num), intent(out) :: Cp
       
       real, dimension(z_num) :: pori, porf, Cp_temp
       real, dimension(z_num,z_num) :: MM
       real, dimension(z_num) :: Knows
       real :: m_Gfx, A, B, C, Z1
       integer :: kk, ll
-      real, dimension(z_num) :: T_last, T_new, Kp_s
+      real, dimension(z_num) :: T_last, Kp_s
+!dmr [UNUSED]      real, dimension(z_num) :: T_last, T_new, Kp_s      
       real, dimension(z_num) :: T_iter
       real, dimension(z_num) :: DD
       real, dimension(z_num-1) :: DL, DU
-      integer, dimension(z_num) :: IPIV
+!dmr [UNUSED]      integer, dimension(z_num) :: IPIV
       integer :: info_dgesv
       
       m_Gfx = gfx/1000.0
@@ -291,7 +299,7 @@ module Fonction_implicit
       Timp(1:z_num) = T_iter(1:z_num)
       !write(*,*) dz(z_num),dz(z_num-1)
 
-    end subroutine Implicit
+    end subroutine Implicit_T
 
 
 end module Fonction_implicit

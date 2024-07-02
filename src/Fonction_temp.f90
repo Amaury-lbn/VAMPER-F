@@ -5,7 +5,10 @@ module Fonction_temp
   use Parametrisation, only : C_ice,C_dry_soil,C_organic,C_water,freezing_range,Latent_Heat,rho_ice,z_num,K_fluids
   use Parametrisation, only :rho_organic,rho_soil,rho_water,K_other_minerals,K_organic,K_quartz,q_quartz,Bool_geometric,K_ice
 
-  Implicit none
+  implicit none
+
+  private
+  public:: AppHeatCapacity, ThermalConductivity, Permafrost_Depth
 
   contains
 
