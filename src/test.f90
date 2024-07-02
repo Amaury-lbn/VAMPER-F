@@ -25,9 +25,23 @@ program test_fonctions
   implicit none
   
   integer :: kk, ll,organic_ind,spy, nb_lines,t_num,dim_temp,dim_swe,t_step,t_deb
-  real,dimension(:),allocatable :: time_gi, glacial_ind
+  real,dimension(:),allocatable :: time_gi, glacial_ind ! dmr glacial indexes, to be checked with Amaury
   real :: Tb,dt
-  real, dimension(:),allocatable:: T_air,Temp,Kp,n,dz,D,Cp,swe_f_t,pori,porf,snow_dp_t,rho_snow_t,T_snw_t
+  real, dimension(:),allocatable::      T_air     & !dmr [SPAT_VAR], surface air temperature // forcing
+                                       ,Temp      & !dmr [SPAT_VAR], soil temperature over the vertical // prognostic
+                                       ,Kp        & !dmr [CNTST]     heat conductivity constant over the depth, current value is 2
+                                       ,n         & !dmr [SPAT_VAR], porosity on the vertical
+                                       ,Cp        & !dmr [SPAT_VAR]  specific heat capacity
+                                       ,pori      & !dmr [???  TBC]
+                                       ,porf      & !dmr [???  TBC]
+                                       ! GEOMETRY VARIABLES
+                                       ,dz        & !dmr [VERTCL]    thickness of the layers
+                                       ,D         & !dmr [VERTCL]    depth of the layers
+                                       ! FORCING VARIABLES
+                                       ,swe_f_t   & !dmr [SPAT_VAR]  SWE forcing, allocated to (1:dim_swe) and values read in external text file (unit_nb_2)
+                                       ,snow_dp_t & !dmr [SPAT_VAR] snow depth over time forcing ??? 
+                                       ,rho_snow_t& !dmr [SPAT_VAR] density of snow over time forcing ???
+                                       ,T_snw_t     !dmr [SPAT_VAR] temperature of snow over time forcing ???
 
 
   t_deb = 0
@@ -73,11 +87,11 @@ program test_fonctions
 
   write(*,*) "[MAIN] spy: ", spy
 
-  allocate(Kp(1:z_num-1))
-  allocate(Cp(1:z_num))
-  allocate(Temp(1:z_num))
-  allocate(pori(1:z_num))
-  allocate(porf(1:z_num))
+  allocate(Kp(1:z_num-1)) !dmr SPAT_VAR
+  allocate(Cp(1:z_num))   !dmr SPAT_VAR
+  allocate(Temp(1:z_num)) !dmr SPAT_VAR
+  allocate(pori(1:z_num)) !dmr SPAT_VAR
+  allocate(porf(1:z_num)) !dmr SPAT_VAR
 
   !dmr [2024-06-28] [ADDING COMMENTS]
   !dmr No spatial dependence till here ...
