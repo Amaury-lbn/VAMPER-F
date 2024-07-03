@@ -15,6 +15,7 @@ module Fonction_temp
 
 
   subroutine AppHeatCapacity(z_num, T, Tf, n, org_ind, Cp, porf, pori)
+    !dmr Given Temperature and porosity (n), this computes a new Cp value and porf, pori on the vertical
     implicit none
     integer, intent(in) :: z_num, org_ind
     real, intent(in) :: Tf
