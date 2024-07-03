@@ -45,7 +45,7 @@ program test_fonctions
                                        ,rho_snow_t& !dmr [SPAT_VAR] density of snow over time forcing ???
                                        ,T_snw_t     !dmr [SPAT_VAR] temperature of snow over time forcing ???
 
-  integer, parameter :: gridNo = 1 !! Temporary to test before expanding
+  integer :: gridNo = 1 ! index for spatial loops
 
 
   t_deb = 0
@@ -98,19 +98,22 @@ program test_fonctions
   allocate(pori(1:z_num,1:gridNoMax)) !dmr SPAT_VAR
   allocate(porf(1:z_num,1:gridNoMax)) !dmr SPAT_VAR
 
+
+  do gridNo = 1, gridNoMax
+
   !dmr [2024-06-28] [ADDING COMMENTS]
   !dmr No spatial dependence till here ...
   !dmr Inputs to Vamper_init:
   !dmr intent(in)                z_num == number of vertical slices
   !dmr intent(in)                dz = vertical stepping
   !dmr intent(in)                D is provided to porosity_init as depth_layer(z_num)
-  !dmr intent(out) (allocatable) Temp = temperature of the soil for all vertical layers
+  !dmr intent(out)               Temp = temperature of the soil for all vertical layers
   !dmr intent(out) (allocatable) time_gi = years B.P. in the glacial index file (I think)
   !dmr intent(out) (allocatable) glacial_ind = array for glacial indexing, if not, then glacial_ind(1) = 0
   !dmr intent(out)               nb_lines = number of lines in the glacial index file, read in that file
   !dmr intent(out)               Kp = heat conductivity constant over the depth, current value is 2
   !dmr intent(out)               Cp = specific heat capacity
-  !dmr intent(out) (allocatable) n -> allocated in Porosity_init to z_num, contains porosity profile [NOTA: BAD_NAME] 
+  !dmr intent(out)               n -> allocated in Porosity_init to z_num, contains porosity profile [NOTA: BAD_NAME] 
   !dmr intent(out)               organic_ind = depth of the organic layer? integer value in vertical index
   !dmr intent(out)               Tb = Temperature Bottom, lower boundary condition ... computed from GeoHeatFlow
   call Vamper_init(dz,D,Temp(:,gridNo),time_gi,glacial_ind,nb_lines,Kp(:,gridNo),Cp(:,gridNo),n(:,gridNo),organic_ind,Tb)
@@ -132,18 +135,16 @@ program test_fonctions
 
   !dmr Those three are allocated to (1:dim_temp) and if BESSI, read from external files.
 
-  !dmr intent(out) (allocatable) snw_dp_t     if BESSI, unit_nb_4 else set to zero
-  !dmr intent(out) (allocatable) rho_snow_t   if BESSI, unit_nb_5 else set to zero
-  !dmr intent(out) (allocatable) T_snw        if BESSI, unit_nb_6 else ... commented read, nothing done [NOTA: UNINITIALIZED]
+  !dmr intent(out) (allocatable) snow_dp_t     if BESSI, unit_nb_4 else set to zero
+  !dmr intent(out) (allocatable) rho_snow_t    if BESSI, unit_nb_5 else set to zero
+  !dmr intent(out) (allocatable) T_snw_t       if BESSI, unit_nb_6 else ... commented read, nothing done [NOTA: UNINITIALIZED]
 
   call Lecture_forcing(z_num,T_air,swe_f_t,snow_dp_t,rho_snow_t,T_snw_t,Temp(:,gridNo),dim_temp,dim_swe)
 
-  write(*,*) "[MAIN] D: ", D
-  !write(*,*) T_air
+!~   write(*,*) "[MAIN] D: ", D
+!~   write(*,*) "[MAIN] forcing: ", dim_temp, dim_swe
   !write(*,*) dz
-
-  write(*,*) "[MAIN] 1|Temp: ",Temp
-
+!~   write(*,*) "[MAIN] 1|Temp: ",Temp
 
   t_step = dim_temp
 
@@ -171,12 +172,21 @@ program test_fonctions
   !dmr intent(in)    (dim_temp)  T_snw_t       / TEMP of snow forcing
   !dmr intent(in)    (nb_lines)  glacial_ind   / glacial index modifier
   
-  call Vamper_step(T_air,swe_f_t,Temp,Tb,Cp,Kp,n,organic_ind,glacial_ind,nb_lines,dim_temp,dim_swe,z_num,dz,dt,t_step, &
-porf,pori,t_deb,rho_snow_t,snow_dp_t,T_snw_t,D)
+  call Vamper_step(T_air,swe_f_t,Temp(:,gridNo),Tb,Cp(:,gridNo),Kp(:,gridNo),n(:,gridNo),organic_ind &
+                  ,glacial_ind,nb_lines,dim_temp,dim_swe,z_num,dz,dt,t_step                          &
+                  ,porf(:,gridNo),pori(:,gridNo),t_deb,rho_snow_t,snow_dp_t,T_snw_t,D)
 
-  write(*,*) "[MAIN] 2|Temp: ",Temp
+
+  write(*,*) "[MAIN] 2|Temp: ",Temp(:,gridNo)
+
+  deallocate(T_air)
+  deallocate(swe_f_t)
+  deallocate(snow_dp_t)
+  deallocate(rho_snow_t)
+  deallocate(T_snw_t)
+  
+  enddo ! loop on gridNo
 
   write(*,*) "ok"
   
-
  end program test_fonctions

@@ -7,10 +7,10 @@ module Parametrisation
 
   integer,parameter :: TotTime = 400000       !temps total en année
   integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
-  integer, parameter :: t_fin=0
-  integer,parameter :: YearType = 360        !nombre de jour par an
-  integer,parameter :: z_num = 101           !nombre de couche étudiée
-  integer,parameter :: EXPE = 1               !de 1 à 4, quelle expérience va être réalisée
+  integer,parameter :: t_fin = 0
+  integer,parameter :: YearType = 360         !nombre de jour par an
+  integer,parameter :: z_num = 101            !nombre de couches étudiée
+!dmr [UNUSED]  integer,parameter :: EXPE = 1               !de 1 à 4, quelle expérience va être réalisée
   integer,parameter :: GridType = 1           !(1) Log-generated, (2) Linear-generated 
   integer,parameter :: PorosityType = 3       !(1) linéaire, (autre) exponentiellement décroissante en fonction de la profondeur
   integer,parameter :: Bool_Snow = 1          ! forçage en neige ou non (1 ou 0)
@@ -22,7 +22,7 @@ module Parametrisation
   integer, parameter :: Bool_layer_temp = 1       ! Creation of .txt with the temperature of the soil at different layer
   integer, parameter :: Forcage_Month_day = 0     ! (1) Daily or (0) monthly forcing
   integer, parameter :: Bool_Swe_Snw = 1          ! (1) Snow forcing, (0) Swe forcing
-  integer, parameter :: Bool_Model_Snow = 1       ! (1) Using snow model to find snow_depth, (0) Forcing with snow_depth
+  integer, parameter :: Bool_Model_Snow = 1       ! (1) Usinsg snow model to find snow_depth, (0) Forcing with snow_depth
   integer, parameter :: Bool_Bessi = 2
   integer, parameter :: Bool_geometric = 1
 
@@ -70,7 +70,7 @@ module Parametrisation
   integer, parameter :: s_l_max = 2      ! nombre de couche de neige (marche que avec 1)
 
   !dmr spatialisation
-  integer, parameter :: gridNoMax = 1 !dmr start with a pseudo nb_points equal to one
+  integer, parameter :: gridNoMax = 1    !dmr spatial index, no assumption of the spatial arrangement
   
 end module Parametrisation
 
