@@ -1,0 +1,26 @@
+# 2024-03-29 / LIPaS / (c) dmr-dj
+
+title="vamper-f / LIPaS configuration file"
+
+[pkginfo]
+name="VAMPER-F"
+owner="Didier Roche, Nathaelle Bouttes, Amaury Lambin"
+license="Apache-2.0"
+date=""
+type="external"
+
+[retrieve]
+method="git"
+path="https://github.com/dmr-dj/vamper-f.git"
+
+[dependencies]
+pkgs="lapack"
+
+[build]
+lang="FF"
+method=""
+mkfile=""
+target=""
+location="src"
+
+# The End of All Things (op. cit.)
