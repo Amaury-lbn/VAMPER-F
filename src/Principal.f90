@@ -284,23 +284,23 @@ status="old",action='read')
     
      if (Bool_layer_temp==1)then
 
-       open(newunit=u_n_23,file="Resultats/Tl_23_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_23,file="Results/Tl_23_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_53,file="Resultats/Tl_53_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_53,file="Results/Tl_53_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_93,file="Resultats/Tl_93_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_93,file="Results/Tl_93_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_143,file="Resultats/Tl_143_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_143,file="Results/Tl_143_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_250,file="Resultats/Tl_250_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_250,file="Results/Tl_250_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_350,file="Resultats/Tl_350_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_350,file="Results/Tl_350_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_550,file="Resultats/Tl_550_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_550,file="Results/Tl_550_2.0_0.1_0.0.txt",&
 status="replace",action='write')
-       open(newunit=u_n_900,file="Resultats/Tl_900_2.0_0.1_0.0.txt",&
+       open(newunit=u_n_900,file="Results/Tl_900_2.0_0.1_0.0.txt",&
 status="replace",action='write') 
-       open(newunit=snw_d,file="Resultats/Snw_depth.txt",status="replace",action='write') 
+       open(newunit=snw_d,file="Results/Snw_depth.txt",status="replace",action='write') 
 
        layer_temp23 = 28
        layer_temp53 = 35
@@ -311,15 +311,15 @@ status="replace",action='write')
        layer_temp550 = 55
        layer_temp900 = 60
        
-       !open(newunit=u_n_23,file="Resultats/Tl_75_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_53,file="Resultats/Tl_175_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_93,file="Resultats/Tl_375_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_143,file="Resultats/Tl_675_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_250,file="Resultats/Tl_875_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_350,file="Resultats/Tl_1275_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_550,file="Resultats/Tl_1675_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_900,file="Resultats/Tl_2475_2.0_1.0_1.0.txt",status="replace",action='write') 
-       !open(newunit=snw_d,file="Resultats/Snw_depth.txt",status="replace",action='write')
+       !open(newunit=u_n_23,file="Results/Tl_75_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_53,file="Results/Tl_175_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_93,file="Results/Tl_375_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_143,file="Results/Tl_675_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_250,file="Results/Tl_875_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_350,file="Results/Tl_1275_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_550,file="Results/Tl_1675_2.0_1.0_1.0.txt",status="replace",action='write')
+       !open(newunit=u_n_900,file="Results/Tl_2475_2.0_1.0_1.0.txt",status="replace",action='write') 
+       !open(newunit=snw_d,file="Results/Snw_depth.txt",status="replace",action='write')
 
        !layer_temp23 = 57
        !layer_temp53 = 68
