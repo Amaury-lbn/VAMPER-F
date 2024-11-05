@@ -16,7 +16,8 @@ module Principal
   
   public :: Vamper_init, Lecture_forcing, Vamper_step
   
-  integer :: u_n_23,u_n_53,u_n_93,u_n_143,u_n_250,u_n_350,u_n_550,u_n_900
+!dmr&mbv  integer :: u_n_23,u_n_53,u_n_93,u_n_143,u_n_250,u_n_350,u_n_550,u_n_900 [TOREMOVE]
+  integer :: u_n_ml
   integer :: layer_temp23,layer_temp53,layer_temp93,layer_temp143,layer_temp250,layer_temp350,layer_temp550,layer_temp900
   integer :: unit_nb_1,unit_nb_2,unit_nb_3,unit_nb_4,unit_nb_5,unit_nb_6
 
@@ -261,11 +262,12 @@ status="old",action='read')
 
 
   subroutine Vamper_step(T_air,swe_f_t,Temp,Tb,Cp,Kp,n,organic_ind,glacial_ind,nb_lines,dim_temp,dim_swe,z_num,dz,dt,t_step, &
-                         porf,pori,t_deb,rho_snow_t,snw_dp_t,T_snw_t,D)
+                         porf,pori,t_deb,rho_snow_t,snw_dp_t,T_snw_t,D, spy, t_num)
 
     integer, intent(inout) ::  organic_ind, nb_lines, dim_swe, dim_temp, t_step,t_deb
     real, intent(in) :: dt, Tb
     integer, intent(in) :: z_num
+    integer, intent(in) :: spy, t_num
 
     real,dimension(z_num),intent(inout) :: dz,n,porf,pori
     real,dimension(z_num),intent(inout) :: Kp,Cp,D
@@ -274,70 +276,25 @@ status="old",action='read')
     real,dimension(nb_lines),intent(in) :: glacial_ind
     real, dimension(z_num),intent(inout) :: Temp
 
-    integer :: kk, ll, indice_tab, snw_d,t_num,s_l_t,ind_snw
-    real :: T_soil, T_glacial, swe_tot,snw_tot,rho_snow,swe_f,frac_snw,k_s,Cp_snow,spy,snw_old,dz_snow,Per_depth
+    integer :: kk, ll, indice_tab, s_l_t,ind_snw
+    real :: T_soil, T_glacial, swe_tot,snw_tot,rho_snow,swe_f,frac_snw,k_s,Cp_snow,snw_old,dz_snow,Per_depth
     real, dimension(s_l_max) :: Tsnw
     real, dimension(z_num-1) ::  h_n, h_pori, h_porf
     real, dimension(z_num) :: T_old
     real, dimension(:),allocatable :: T_layer23,T_layer53,T_layer93,T_layer143,T_layer250,T_layer350,T_layer550,T_layer900
 
+! dmr&mbv --- Added for cleaner output at given fixed levels
+    integer, dimension(10)            :: indx_min
+    real   , dimension(10), parameter :: fixed_levs = [ 0.0, 1.0, 2.0, 5.0, 50.0, 100.0, 200.0, 500.0, 750.0, 1000.0 ]
+    integer :: zzz
     
      if (Bool_layer_temp==1)then
 
-       open(newunit=u_n_23,file="Results/Tl_23_2.0_0.1_0.0.txt",&
-status="replace",action='write')
-       open(newunit=u_n_53,file="Results/Tl_53_2.0_0.1_0.0.txt",&
-status="replace",action='write')
-       open(newunit=u_n_93,file="Results/Tl_93_2.0_0.1_0.0.txt",&
-status="replace",action='write')
-       open(newunit=u_n_143,file="Results/Tl_143_2.0_0.1_0.0.txt",&
-status="replace",action='write')
-       open(newunit=u_n_250,file="Results/Tl_250_2.0_0.1_0.0.txt",&
-status="replace",action='write')
-       open(newunit=u_n_350,file="Results/Tl_350_2.0_0.1_0.0.txt",&
-status="replace",action='write')
-       open(newunit=u_n_550,file="Results/Tl_550_2.0_0.1_0.0.txt",&
-status="replace",action='write')
-       open(newunit=u_n_900,file="Results/Tl_900_2.0_0.1_0.0.txt",&
-status="replace",action='write') 
-       open(newunit=snw_d,file="Results/Snw_depth.txt",status="replace",action='write') 
+       open(newunit=u_n_ml,file="Results/Tl_multilayers.txt", status="replace",action='write') 
 
-       layer_temp23 = 28
-       layer_temp53 = 35
-       layer_temp93 = 40
-       layer_temp143 = 44
-       layer_temp250 = 49
-       layer_temp350 = 51
-       layer_temp550 = 55
-       layer_temp900 = 60
-       
-       !open(newunit=u_n_23,file="Results/Tl_75_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_53,file="Results/Tl_175_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_93,file="Results/Tl_375_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_143,file="Results/Tl_675_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_250,file="Results/Tl_875_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_350,file="Results/Tl_1275_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_550,file="Results/Tl_1675_2.0_1.0_1.0.txt",status="replace",action='write')
-       !open(newunit=u_n_900,file="Results/Tl_2475_2.0_1.0_1.0.txt",status="replace",action='write') 
-       !open(newunit=snw_d,file="Results/Snw_depth.txt",status="replace",action='write')
-
-       !layer_temp23 = 57
-       !layer_temp53 = 68
-       !layer_temp93 = 78
-       !layer_temp143 = 85
-       !layer_temp250 = 89
-       !layer_temp350 = 94
-       !layer_temp550 = 97
-       !layer_temp900 = 101
-       
-       allocate(T_layer23(1:365*20))
-       allocate(T_layer53(1:365*20))
-       allocate(T_layer93(1:365*20))
-       allocate(T_layer143(1:365*20))
-       allocate(T_layer250(1:365*20))
-       allocate(T_layer350(1:365*20))
-       allocate(T_layer550(1:365*20))
-       allocate(T_layer900(1:365*20))
+       DO zzz = LBOUND(indx_min,DIM=1), UBOUND(indx_min,DIM=1)
+          indx_min(zzz) = minloc(abs(D-fixed_levs(zzz)), DIM=1)
+       ENDDO
 
     end if
 
@@ -383,24 +340,28 @@ status="replace",action='write')
        
     end do
 
-# if Daily == 0
-
-       spy = 12
-       t_num = t_step*12
-
-#else 
-
-       spy = 365
-       t_num = t_step 
-       !t_num = 2
-
-#endif
+! [TOREMOVE]
+! dmr&mbv --- already defined in t_disc
+!# if Daily == 0
+!
+!       spy = 12
+!       t_num = t_step*12
+!
+!#else 
+!
+!       spy = 365
+!       ! t_num = t_step 
+!       !t_num = 2
+!       t_num = 365*30
+!
+!#endif
+! [TOREMOVE]
 
     !write(*,*) n
 
     do ll=1,t_num
 
-       !write(*,*) "ok"
+       write(*,*) "Time step:: ", ll," / ", t_num
 
        snw_old = snw_tot
 
@@ -416,8 +377,8 @@ status="replace",action='write')
        !write(*,*) snw_tot,T_soil,rho_snow
        if (Bool_glacial==1)then
 
-          indice_tab = nb_lines-floor((-(ll/spy)+t_deb)/100.0)
-          T_glacial=alpha*(glacial_ind(indice_tab-1)+(100-mod((-(ll/spy)+t_deb),100.0))*(glacial_ind(indice_tab)- &
+          indice_tab = nb_lines-floor((-(ll/real(spy))+t_deb)/100.0)
+          T_glacial=alpha*(glacial_ind(indice_tab-1)+(100-mod((-(ll/real(spy))+t_deb),100.0))*(glacial_ind(indice_tab)- &
 glacial_ind(indice_tab-1))/100.0)
           T_soil = (T_glacial+T_soil)
           !write(*,*) indice_tab,T_soil,glacial_ind(indice_tab-1),glacial_ind(indice_tab),T_glacial,mod((-(ll/spy)+t_deb),100.0)
@@ -499,25 +460,14 @@ glacial_ind(indice_tab-1))/100.0)
        !write(*,*) Kp(5)*dt/(Cp(5)*dz(5)*dz(5)) 
 
        if (Bool_layer_temp==1)then
-         !write(*,*) "ok"
          if (ll>t_num-7300)then
-             T_layer23(ll+7300-t_num) = Temp(layer_temp23)
-             T_layer53(ll+7300-t_num) = Temp(layer_temp53)
-             T_layer93(ll+7300-t_num) = Temp(layer_temp93)
-             T_layer143(ll+7300-t_num) = (Temp(layer_temp143)+Temp(layer_temp143+1))/2.0
-             !T_layer143(ll+7300-t_num) = Temp(layer_temp143)
-             !T_layer250(ll+7300-t_num) = (Temp(layer_temp250)+Temp(layer_temp250 - 1))/2.0
-             T_layer250(ll+7300-t_num) = Temp(layer_temp250)
-             T_layer350(ll+7300-t_num) = Temp(layer_temp350)
-             T_layer550(ll+7300-t_num) = Temp(layer_temp550)
-             T_layer900(ll+7300-t_num) = Temp(layer_temp900)
-            ! write(snw_d,*) snw_tot
+            write(u_n_ml,'(10F12.3)') ( Temp(indx_min(zzz)) &
+                 , zzz=LBOUND(indx_min,DIM=1),UBOUND(indx_min,DIM=1))
           end if
-          !write(*,*) "ok"
        end if
 
        call Permafrost_Depth(Temp,D,Per_depth)
-       write(*,*) "[PRINC] Per_depth: ", Per_depth
+       ! write(*,*) "[PRINC] Per_depth: ", Per_depth
        
        !write(*,*) Kp
 
@@ -527,23 +477,10 @@ glacial_ind(indice_tab-1))/100.0)
 
     if (Bool_glacial.eq.1) then !dmr indice_tab is undefined if Bool_glacial is not 1
       write(*,*) "[PRINC] indice_tab,t_num,organic_ind: ", indice_tab,t_num,organic_ind
-    !write(u_n_23,*) Kp
     endif
    
-    if (Bool_layer_temp==1)then
-       write(u_n_23,*) T_layer23
-       write(u_n_53,*) T_layer53
-       write(u_n_93,*) T_layer93
-       write(u_n_143,*) T_layer143
-       write(u_n_250,*) T_layer250
-       write(u_n_350,*) T_layer350
-       write(u_n_550,*) T_layer550
-       write(u_n_900,*) T_layer900
-    end if
-
-    close(u_n_23)
+    close(u_n_ml)
    
-    !write(*,*) "ok"
 
   end subroutine Vamper_step
 

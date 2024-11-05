@@ -89,7 +89,7 @@ program test_fonctions
 !~   call z_disc(z_num, Depth, GridType, dz, D)
 !dmr [2024-06-28] [TBRMD]
 
-  write(*,*) "[MAIN] spy: ", spy
+  write(*,*) "[MAIN] spy: ", spy, t_num
 
   allocate(Kp(1:z_num-1,1:gridNoMax)) !dmr SPAT_VAR
   allocate(Cp(1:z_num,1:gridNoMax))   !dmr SPAT_VAR
@@ -174,7 +174,7 @@ program test_fonctions
   
   call Vamper_step(T_air,swe_f_t,Temp(:,gridNo),Tb,Cp(:,gridNo),Kp(:,gridNo),n(:,gridNo),organic_ind &
                   ,glacial_ind,nb_lines,dim_temp,dim_swe,z_num,dz,dt,t_step                          &
-                  ,porf(:,gridNo),pori(:,gridNo),t_deb,rho_snow_t,snow_dp_t,T_snw_t,D)
+                  ,porf(:,gridNo),pori(:,gridNo),t_deb,rho_snow_t,snow_dp_t,T_snw_t,D, spy, t_num)
 
 
   write(*,*) "[MAIN] 2|Temp: ",Temp(:,gridNo)

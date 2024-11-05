@@ -5,8 +5,8 @@ module Parametrisation
   
   public !dmr here can be fully public, these are only parameter constants
 
-  integer,parameter :: TotTime = 400000       !temps total en année
-  integer,parameter :: Timestep = 30          !nombre de jour entre chaque pas de temps 
+  integer,parameter :: TotTime = 4000         !temps total en année
+  integer,parameter :: Timestep = 1           !nombre de jour entre chaque pas de temps 
   integer,parameter :: t_fin = 0
   integer,parameter :: YearType = 360         !nombre de jour par an
   integer,parameter :: z_num = 101            !nombre de couches étudiée
@@ -27,8 +27,8 @@ module Parametrisation
   integer, parameter :: Bool_geometric = 1
 
   real,parameter :: Depth = 1000.0              !profondeur de la modélisation
-  real,parameter :: T_init = 0                !température initiale a la surface
-  real,parameter :: T_freeze = 0             !température où l'eau est considérée comme gelée
+  real,parameter :: T_init = 0.0                !température initiale a la surface
+  real,parameter :: T_freeze = 0.0             !température où l'eau est considérée comme gelée
   real,parameter :: freezing_range = 2.0          ! Temperature at wich the snow start to melt
   real,parameter :: Gfx = 65.0                  ! flux géothermique de la terre (a modifier peut être)
   real,parameter :: Porosity_soil = 0.1       ! porosité du sol

@@ -21,7 +21,6 @@ contains
     
     Implicit none
 
-!~     integer,intent(in) ::  TotTime,Timestep,YearType
     integer,intent(out) :: t_num, spy
     real, intent(out) :: dt
     real :: yrs2days
@@ -65,8 +64,6 @@ contains
     
     Implicit none 
 
-!~     real, intent(in) :: Depth
-!~     integer, intent(in) :: Gridtype, z_num
     real, dimension(:), allocatable, intent(out) :: dz,D
     real, dimension(:), allocatable :: D_temp
     integer :: kk
@@ -95,7 +92,7 @@ contains
     do kk = 2, z_num
         D(kk)=D(kk-1) + dz(kk)
     end do
-    
+
   end subroutine z_disc
 
 
