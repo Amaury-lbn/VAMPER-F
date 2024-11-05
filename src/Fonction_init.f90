@@ -22,7 +22,7 @@ module Fonction_init
     real, intent(in) ::  organic_depth
     real, dimension(:), intent(in) :: Depth_layer
     integer, intent(out) :: organic_ind
-    real, dimension(:), allocatable, intent(out) :: n
+    real, dimension(:), intent(out) :: n
     
     ! Variables locales !
 
@@ -31,7 +31,7 @@ module Fonction_init
     real :: origine
     integer :: pas_z
 
-    allocate(n(1:z_num))
+!dmr [TBRMD] already allocated    allocate(n(1:z_num))
     allocate(DepthCalcOrg(1:z_num))
      
     if (Bool_organic == 1) then
